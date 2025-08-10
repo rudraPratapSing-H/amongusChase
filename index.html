@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+    <title>Vent Chase</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&family=Roboto:wght@400&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<div id="start-overlay">
+  <div id="rules-container">
+    <h1>🚨 Vent Chase</h1>
+    <h2>How to Play</h2>
+    <p>You are the <strong>blue character</strong>. Your goal is to outsmart and defeat the <strong>red impostor</strong> before it escapes.</p>
+
+    <h3>Controls</h3>
+    <ul>
+      <li><strong>Desktop:</strong> Use <strong>Arrow Keys</strong> or <strong>WASD</strong> keys to move.</li>
+      <li><strong>Mobile:</strong> Use the on-screen <strong>arrow buttons</strong> that appear once the game starts.</li>
+    </ul>
+
+    <hr>
+
+    <h2>Rules & Objectives</h2>
+    <h3>Your Mission ✅</h3>
+    <ul>
+      <li><strong>Complete Tasks (T):</strong> Move onto the green 'T' tiles.</li>
+      <li><strong>Seal Vents (V):</strong> Move onto the cyan 'V' tiles to block the impostor's escape routes.</li>
+    </ul>
+
+    <h3>The Impostor 🔴</h3>
+    <ul>
+      <li>It hunts down tasks ('T') to sabotage them.</li>
+      <li>It gets scared and runs to a vent ('V') if you get too close.</li>
+      <li>It uses vents to teleport around the map.</li>
+    </ul>
+
+    <h3>How to Win 🏆</h3>
+    <ol>
+      <li><strong>Catch the Impostor</strong> by moving onto its tile.</li>
+      <li><strong>Trap the Impostor</strong> by completing all tasks AND sealing all vents.</li>
+    </ol>
+
+    <h1>🚨 Vent Chase</h1>
+    <h3>How to Lose ☠️</h3>
+    <p>You lose if the impostor escapes through a vent <strong>after</strong> all tasks are completed.</p>
+
+    <p class="form-notice"><strong>Note:</strong> You must win the game to unlock the <b>Form</b>.</p>
+
+    <button id="start-button">Start Game</button>
+  </div>
+</div>
+
+
+<div id="game-wrapper">
+
+    <div id="game-content">
+        <div id="controls-left" class="controls">
+            <button id="up-btn">▲</button>
+            <button id="down-btn">▼</button>
+        </div>
+
+        <canvas id="gameCanvas"></canvas>
+
+        <div id="controls-right" class="controls">
+            <button id="left-btn">◄</button>
+            <button id="right-btn">►</button>
+        </div>
+    </div>
+    
+    <div id="info-header">
+        <h1>🚨 Vent Chase</h1>
+        <div id="hud">
+            <span id="tasksCounter">🧹 Tasks: 0</span> |
+            <span id="ventsCounter">🕳️ Vents: 0</span> |
+            <span id="timer">⏱️ Time: 0s</span>
+        </div>
+    </div>
+    
+    <button id="formButton" onclick="window.location.href='https://forms.gle/YOUR_FORM_LINK'">📝 Proceed to Form</button>
+</div>
+
+<script src="script.js"></script>
+
+</body>
+</html>
