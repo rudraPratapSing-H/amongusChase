@@ -4,7 +4,8 @@ const ctx = canvas.getContext("2d");
 // --- Game Configuration ---
 const PLAYER_MOVE_DURATION = 100;  // Player speed (lower is faster)
 const IMPOSTOR_MOVE_DURATION = 150; // Base impostor animation speed
-const IMPOSTOR_FLEE_ANIMATION_DURATION = 100; // Faster animation when fleeing
+const IMPOSTOR_FLEE_ANIMATION_DURATION = 100;
+let IMPOSTOR_FLEE_MOVE_INTERVAL // Faster animation when fleeing
 let IMPOSTOR_MOVE_INTERVAL = 400; // ms between impostor moves
 const IMPOSTOR_FLEE_DISTANCE = 7; // How close player must be for impostor to flee
 // NEW CONSTRAINT: The impostor will not plot a path within this distance of the player.
@@ -305,7 +306,7 @@ function moveImpostorAI() {
 
     if (isInFleeMode) {
         // Fleeing logic remains the same: find the safest vent.
-        IMPOSTOR_MOVE_INTERVAL = 300;
+        IMPOSTOR_MOVE_INTERVAL = 200;
         animationDuration = IMPOSTOR_FLEE_ANIMATION_DURATION;
         if (vents.length > 0) {
             const bestVent = vents
