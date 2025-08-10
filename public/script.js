@@ -4,7 +4,7 @@ const ctx = canvas.getContext("2d");
 // --- Game Configuration ---
 const PLAYER_MOVE_DURATION = 100;  // Player speed (lower is faster)
 const IMPOSTOR_MOVE_DURATION = 150; // Base impostor animation speed
-const IMPOSTOR_FLEE_ANIMATION_DURATION = 100;
+const IMPOSTOR_FLEE_ANIMATION_DURATION = 75;
 let IMPOSTOR_FLEE_MOVE_INTERVAL // Faster animation when fleeing
 let IMPOSTOR_MOVE_INTERVAL = 400; // ms between impostor moves
 const IMPOSTOR_FLEE_DISTANCE = 7; // How close player must be for impostor to flee
