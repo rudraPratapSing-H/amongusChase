@@ -181,46 +181,43 @@ body.game-active #game-wrapper {
 }
 
 /* --- On-Screen Controls --- */
-#controls-left {
-  display: flex;
-  flex-direction: column; /* Stack buttons vertically */
-  justify-content: center;
-  align-items: center;
-  flex-basis: 18vw; /* Controls take up a fixed percentage of width */
-  height: 100%;
-  gap: 20px; /* Space between buttons */
-  flex-shrink: 0;
-}
+/* Make parent container wrap on small screens */
+#controls-left,
 #controls-right {
   display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-  flex-basis: 18vw; /* Controls take up a fixed percentage of width */
-  height: 100%;
-  gap: 20px; /* Space between buttons */
-  flex-shrink: 0;
+  flex-wrap: wrap; /* Allow wrapping instead of overflow */
 }
 
+/* Ensure buttons never overflow the viewport */
 .controls button {
   background-color: rgba(51, 51, 51, 0.7);
   border: 2px solid #555;
   color: #eee;
-  border-radius: 50%; /* Make buttons circular */
-  width: clamp(60px, 12vw, 90px); /* Responsive button size */
-  height: clamp(60px, 12vw, 90px);
-  font-size: clamp(24px, 5vw, 36px);
+  border-radius: 50%;
+  width: clamp(50px, 12vw, 90px);
+  height: clamp(50px, 12vw, 90px);
+  font-size: clamp(20px, 5vw, 36px);
+  max-width: 100%; /* Prevents overflow */
+  max-height: 100%;
   cursor: pointer;
-  user-select: none; /* Prevents selecting text on mobile */
-  -webkit-tap-highlight-color: transparent; /* Removes tap highlight on iOS */
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
-.controls button:active {
-  background-color: #555;
-  transform: scale(0.95);
+/* On very small screens, shrink size and gap */
+@media (max-width: 480px) {
+  #controls-left,
+  #controls-right {
+    gap: 10px; /* Smaller gap on small screens */
+  }
+  .controls button {
+    width: clamp(45px, 14vw, 70px);
+    height: clamp(45px, 14vw, 70px);
+    font-size: clamp(18px, 4.5vw, 28px);
+  }
 }
 
 /* --- Form Button --- */
