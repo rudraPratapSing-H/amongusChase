@@ -41,7 +41,7 @@ let touchStartY = null;
 
 let tileMap = [
   "XXXXXXXXXXXXXXXXXXXXXXXXX",
-  "X   T     X   T         X",
+  "X   T       X   T        X",
   "X XXXXXXXX XXX XXXXXXX XX",
   "X V     X   X       X   X",
   "X   XXX X XXXXXXX X XXX X",
