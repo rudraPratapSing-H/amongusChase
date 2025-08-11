@@ -19,8 +19,8 @@ body {
   --button-bg: rgba(51, 51, 51, 0.7);
   --button-bg-active: #555;
   --button-border: #555;
-  --font-main: 'Orbitron', sans-serif;
-  --font-body: 'Roboto', sans-serif; /* Added a more readable font for rules */
+  --font-main: "Orbitron", sans-serif;
+  --font-body: "Roboto", sans-serif; /* Added a more readable font for rules */
 }
 
 /* --- Start Overlay --- */
@@ -65,12 +65,14 @@ body {
   color: #ccc;
   margin-bottom: 10px;
 }
-#rules-container p, #rules-container li {
+#rules-container p,
+#rules-container li {
   font-family: var(--font-body);
   font-size: clamp(0.9rem, 2.5vw, 1rem);
   line-height: 1.6;
 }
-#rules-container ul, #rules-container ol {
+#rules-container ul,
+#rules-container ol {
   padding-left: 20px;
 }
 #rules-container strong {
@@ -107,105 +109,135 @@ body {
 }
 
 @keyframes pulse {
-  0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(0, 255, 0, 0.7); }
-  70% { transform: scale(1.02); box-shadow: 0 0 10px 15px rgba(0, 255, 0, 0); }
-  100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(0, 255, 0, 0); }
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(0, 255, 0, 0.7);
+  }
+  70% {
+    transform: scale(1.02);
+    box-shadow: 0 0 10px 15px rgba(0, 255, 0, 0);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(0, 255, 0, 0);
+  }
 }
 
 /* --- Game Layout --- */
 /* Hide the main game wrapper until the start button is clicked */
-#game-wrapper {
-    display: none;
-    flex-direction: column;
-    align-items: center;
-    width: 100vw;
-    height: 100vh;
-    padding: 5px;
-    box-sizing: border-box;
+#gameCanvas {
+  display: block;
+  aspect-ratio: 3/2; /* Maintain 3:2 ratio */
+  width: 90vw;         /* Take up most of the screen width */
+  max-width: 900px;    /* Optional limit */
+  height: auto;        /* Auto adjust height from aspect ratio */
+  margin: auto;        /* Center horizontally */
+  background-color: black; /* Just to see it clearly */
 }
+
+/* Center the whole game content vertically & horizontally */
+#game-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center; /* Vertical centering */
+  width: 100vw;
+  height: 100vh;
+}
+
 
 /* This class is added via JS to show and style the active game */
 body.game-active #game-wrapper {
-    display: flex;
+  display: flex;
 }
 
 /* The main content area uses flexbox to position controls and canvas */
 #game-content {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-    height: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  height: 100%;
 }
 
 /* Position the HUD absolutely over the top of the game area */
 #info-header {
-    position: absolute;
-    top: 5px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: rgba(0, 0, 0, 0.5);
-    padding: 5px 10px;
-    border-radius: 10px;
-    z-index: 10;
+  position: absolute;
+  top: 5px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.5);
+  padding: 5px 10px;
+  border-radius: 10px;
+  z-index: 10;
 }
 #info-header h1 {
-    margin: 0 0 5px 0;
-    font-size: clamp(16px, 2.5vw, 22px);
+  margin: 0 0 5px 0;
+  font-size: clamp(16px, 2.5vw, 22px);
 }
 #hud {
-    font-size: clamp(12px, 2vw, 16px);
-    margin: 0;
+  font-size: clamp(12px, 2vw, 16px);
+  margin: 0;
 }
 
 /* --- On-Screen Controls --- */
-.controls {
-    display: flex;
-    flex-direction: column; /* Stack buttons vertically */
-    justify-content: center;
-    align-items: center;
-    flex-basis: 18vw; /* Controls take up a fixed percentage of width */
-    height: 100%;
-    gap: 20px; /* Space between buttons */
-    flex-shrink: 0;
+#controls-left {
+  display: flex;
+  flex-direction: column; /* Stack buttons vertically */
+  justify-content: center;
+  align-items: center;
+  flex-basis: 18vw; /* Controls take up a fixed percentage of width */
+  height: 100%;
+  gap: 20px; /* Space between buttons */
+  flex-shrink: 0;
+}
+#controls-right {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  flex-basis: 18vw; /* Controls take up a fixed percentage of width */
+  height: 100%;
+  gap: 20px; /* Space between buttons */
+  flex-shrink: 0;
 }
 
 .controls button {
-    background-color: rgba(51, 51, 51, 0.7);
-    border: 2px solid #555;
-    color: #eee;
-    border-radius: 50%; /* Make buttons circular */
-    width: clamp(60px, 12vw, 90px); /* Responsive button size */
-    height: clamp(60px, 12vw, 90px);
-    font-size: clamp(24px, 5vw, 36px);
-    cursor: pointer;
-    user-select: none; /* Prevents selecting text on mobile */
-    -webkit-tap-highlight-color: transparent; /* Removes tap highlight on iOS */
-    display: flex;
-    justify-content: center;
-    align-items: center;
+  background-color: rgba(51, 51, 51, 0.7);
+  border: 2px solid #555;
+  color: #eee;
+  border-radius: 50%; /* Make buttons circular */
+  width: clamp(60px, 12vw, 90px); /* Responsive button size */
+  height: clamp(60px, 12vw, 90px);
+  font-size: clamp(24px, 5vw, 36px);
+  cursor: pointer;
+  user-select: none; /* Prevents selecting text on mobile */
+  -webkit-tap-highlight-color: transparent; /* Removes tap highlight on iOS */
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .controls button:active {
-    background-color: #555;
-    transform: scale(0.95);
+  background-color: #555;
+  transform: scale(0.95);
 }
 
 /* --- Form Button --- */
 /* Hide the form button until the game is over */
 #formButton {
-    display: none;
-    position: absolute;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    padding: 15px 30px;
-    font-size: 1.2rem;
-    font-family: 'Orbitron', sans-serif;
-    background-color: #00ff00;
-    color: black;
-    border: none;
-    border-radius: 5px;
-    z-index: 20;
-    cursor: pointer;
+  display: none;
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 15px 30px;
+  font-size: 1.2rem;
+  font-family: "Orbitron", sans-serif;
+  background-color: #00ff00;
+  color: black;
+  border: none;
+  border-radius: 5px;
+  z-index: 20;
+  cursor: pointer;
 }

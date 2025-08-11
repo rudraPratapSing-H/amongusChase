@@ -142,23 +142,38 @@ function endGame(message) {
 }
 
 // --- Drawing and Display ---
-
 function resizeCanvas() {
-    const availableWidth = window.innerWidth * 0.64;
-    const availableHeight = window.innerHeight * 0.95;
-    const size = Math.min(availableWidth, availableHeight);
+    const aspectRatio = 3 / 2; // width : height
 
-    canvas.width = size;
-    canvas.height = size;
-    tileSize = Math.floor(size / cols);
+    // Available space from your existing constraints
+    const maxWidth = window.innerWidth * 0.64;
+    const maxHeight = window.innerHeight * 0.95;
 
+    // Calculate best fit for 3:2 ratio
+    let width = maxWidth;
+    let height = width / aspectRatio;
+
+    if (height > maxHeight) {
+        height = maxHeight;
+        width = height * aspectRatio;
+    }
+
+    // Apply to canvas
+    canvas.width = width;
+    canvas.height = height;
+
+    // Adjust tile size to fit the width (or height, depending on your grid)
+    tileSize = Math.floor(width / cols);
+
+    // Update player and impostor screen positions
     player.screenX = player.x * tileSize;
     player.screenY = player.y * tileSize;
     if (impostor) {
         impostor.screenX = impostor.x * tileSize;
         impostor.screenY = impostor.y * tileSize;
     }
-    
+
+    // Redraw if game still active
     if (!gameOver) {
         drawGrid();
     }
@@ -440,7 +455,7 @@ function handleImpostorLanding() {
       endGame("Impostor Escaped!");
       return;
     }
-    const otherVents = allVents.filter(v => v.x !== impostor.x || v.y !== impostor.y);
+    setTimeout(()=>{ const otherVents = allVents.filter(v => v.x !== impostor.x || v.y !== impostor.y);
     if (otherVents.length > 0) {
       const randomVent = otherVents[Math.floor(Math.random() * otherVents.length)];
       impostor.x = randomVent.x;
@@ -448,7 +463,8 @@ function handleImpostorLanding() {
       impostor.screenX = impostor.x * tileSize;
       impostor.screenY = impostor.y * tileSize;
       drawGrid();
-    }
+    }}, 1000)
+   
   }
 }
 
