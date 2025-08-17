@@ -48,7 +48,7 @@ let impostorMoveInterval = null;
 // --- The Game Map Layout ---
 let tileMap = [
     "XXXXXXXXXXXXXXXXXXXXXXXXX",
-    "X   T    X    T       X",
+    "X   T    V    T         X",
     "X XXXXXXXX XXX XXXXXXX XX",
     "X V   X         X   X",
     "X   XXX X XXXXXXX X XXX X",
