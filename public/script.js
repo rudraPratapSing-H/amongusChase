@@ -134,7 +134,7 @@ function endGame(message) {
     if (isWin) {
         sounds.win.play();
         endButton.innerHTML = "📝 Proceed to Form";
-        endButton.onclick = () => (window.location.href = "https://forms.gle/YOUR_FORM_LINK");
+        endButton.onclick = () => (window.location.href = "https://docs.google.com/forms/d/e/1FAIpQLSeF5yvyqYh6CrKAMW7uFT257aCfXfgVdDUpYn7IMZtEWonoZA/viewform?usp=dialog");
     } else {
         sounds.lose.play();
         endButton.innerHTML = "🔄 Retry";
