@@ -17,8 +17,8 @@
 
     <h3>Controls</h3>
     <ul>
-      <li><strong>Desktop:</strong> Use <strong>Arrow Keys</strong> or <strong>WASD</strong> keys to move.</li>
-      <li><strong>Mobile:</strong> Use the on-screen <strong>arrow buttons</strong> that appear once the game starts.</li>
+        <li><strong>Tap / Click:</strong> The easiest way to play! Simply tap (on mobile) or click (on desktop) any open tile, and your character will automatically move there.</li>
+        <li><strong>Keyboard:</strong> For precise, step-by-step movement, you can also use the <strong>Arrow Keys</strong> or <strong>WASD</strong> on a desktop computer.</li>
     </ul>
 
     <hr>
@@ -26,24 +26,23 @@
     <h2>Rules & Objectives</h2>
     <h3>Your Mission ✅</h3>
     <ul>
-      <li><strong>Complete Tasks (T):</strong> When you pass through a green task tile ('T'), you complete it.</li>
-      <li><strong>Seal Vents (V):</strong> When you pass through a cyan vent tile ('V'), you seal it.</li>
+        <li><strong>Complete Tasks (T):</strong> When you pass through a green task tile ('T'), you complete it.</li>
+        <li><strong>Seal Vents (V):</strong> When you pass through a cyan vent tile ('V'), you seal it.</li>
     </ul>
 
     <h3>The Impostor 🔴</h3>
     <ul>
-      <li>When it passes through a task ('T'), it <strong>destroys</strong> it.</li>
-      <li>When it passes through a vent ('V'), it exits from another random vent.</li>
-      <li>It gets scared and runs to a vent if you get too close.</li>
+        <li>When it passes through a task ('T'), it <strong>destroys</strong> it.</li>
+        <li>When it passes through a vent ('V'), it exits from another random vent.</li>
+        <li>It gets scared and runs to a vent if you get too close.</li>
     </ul>
 
     <h3>How to Win 🏆</h3>
     <ol>
-      <li><strong>Catch the Impostor</strong> by moving onto its tile.</li>
-      <li><strong>Trap the Impostor</strong> by completing all tasks AND sealing all vents.</li>
+        <li><strong>Catch the Impostor</strong> by moving onto its tile.(sometimes the impostor dodges)</li>
+        <li><strong>Trap the Impostor</strong> by completing all tasks AND sealing all vents.</li>
     </ol>
 
-    <h1>🚨 Vent Chase</h1>
     <h3>How to Lose ☠️</h3>
     <p>You lose if the impostor escapes through a vent <strong>after</strong> all tasks are completed.</p>
 
@@ -53,21 +52,9 @@
   </div>
 </div>
 
-
 <div id="game-wrapper">
-
     <div id="game-content">
-        <div id="controls-left" class="controls">
-            <button id="up-btn">▲</button>
-            <button id="down-btn">▼</button>
-        </div>
-
         <canvas id="gameCanvas" height="400" width="600"></canvas>
-
-        <div id="controls-right" class="controls">
-            <button id="left-btn">◄</button>
-            <button id="right-btn">►</button>
-        </div>
     </div>
     
     <div id="info-header">

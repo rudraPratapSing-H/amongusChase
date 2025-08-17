@@ -1,6 +1,21 @@
-/* General body and font styles */
+/* --- Variable Definitions --- */
+:root {
+  --primary-bg: #0d0d1a; /* Darker space blue */
+  --primary-text: #f0f0f0;
+  --accent-cyan: #00ffff;
+  --accent-green: #00ff00;
+  --accent-magenta: #ff00ff;
+  --button-bg: rgba(20, 20, 30, 0.7);
+  --button-border: rgba(0, 255, 255, 0.3);
+  --font-main: "Orbitron", sans-serif;
+  --font-body: "Roboto", sans-serif;
+}
+
+/* --- NEW: Animated Background & Body Styles --- */
 body {
-  background-color: var(--primary-bg);
+  background: linear-gradient(-45deg, #0d0d1a, #1a0d1a, #0d1a1a, #1a1a0d);
+  background-size: 400% 400%;
+  animation: move-bg 25s ease infinite;
   color: var(--primary-text);
   font-family: var(--font-main);
   display: flex;
@@ -11,23 +26,38 @@ body {
   overflow: hidden;
 }
 
-:root {
-  --primary-bg: #121212;
-  --primary-text: #f0f0f0;
-  --accent-cyan: #0ff;
-  --accent-green: #00ff00;
-  --button-bg: rgba(51, 51, 51, 0.7);
-  --button-bg-active: #555;
-  --button-border: #555;
-  --font-main: "Orbitron", sans-serif;
-  --font-body: "Roboto", sans-serif; /* Added a more readable font for rules */
+/* Optional: Add a subtle scanline effect for a retro monitor feel */
+body::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: repeating-linear-gradient(
+        0deg,
+        rgba(0, 0, 0, 0.2),
+        rgba(0, 0, 0, 0.2) 1px,
+        transparent 1px,
+        transparent 3px
+    );
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0.3;
 }
 
-/* --- Start Overlay --- */
+
+@keyframes move-bg {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* --- ENHANCED: Start Overlay --- */
 #start-overlay {
   position: fixed;
   inset: 0;
-  background-color: rgba(0, 0, 0, 0.95);
+  background-color: rgba(0, 0, 0, 0.8);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -36,10 +66,17 @@ body {
   box-sizing: border-box;
   overflow-y: auto;
   cursor: default;
+  /* NEW: Fade-in animation */
+  animation: fadeIn 1s ease-out forwards;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
 }
 
 #rules-container {
-  background-color: #1a1a1a;
+  background-color: var(--button-bg);
   border: 1px solid var(--button-border);
   border-radius: 15px;
   padding: clamp(15px, 3vw, 30px);
@@ -48,12 +85,23 @@ body {
   text-align: left;
   max-height: 90vh;
   overflow-y: auto;
+  /* NEW: Glassy effect and animated glow */
+  backdrop-filter: blur(10px);
+  box-shadow: 0 0 15px rgba(0, 255, 255, 0.2);
+  animation: pulse-glow 4s infinite alternate;
 }
+
+@keyframes pulse-glow {
+    from { box-shadow: 0 0 15px rgba(0, 255, 255, 0.2), inset 0 0 10px rgba(0, 255, 255, 0.1); }
+    to { box-shadow: 0 0 30px rgba(255, 0, 255, 0.3), inset 0 0 15px rgba(255, 0, 255, 0.2); }
+}
+
 
 #rules-container h1 {
   text-align: center;
   color: var(--accent-cyan);
   margin-top: 0;
+  text-shadow: 0 0 5px var(--accent-cyan);
 }
 #rules-container h2 {
   color: var(--primary-text);
@@ -85,6 +133,7 @@ body {
   margin: 30px 0;
 }
 
+/* --- ENHANCED: Start Button --- */
 #start-button {
   display: block;
   width: 100%;
@@ -98,39 +147,29 @@ body {
   border: 2px solid var(--accent-green);
   border-radius: 10px;
   cursor: pointer;
-  animation: pulse 2s infinite;
-  transition: background-color 0.2s ease, color 0.2s ease;
+  animation: pulse-button 2s infinite;
+  transition: all 0.3s ease;
+  text-shadow: 0 0 8px var(--accent-green);
 }
 
 #start-button:hover {
   background-color: var(--accent-green);
   color: var(--primary-bg);
+  transform: scale(1.05);
+  box-shadow: 0 0 25px var(--accent-green);
+  text-shadow: none;
   animation: none;
 }
 
-@keyframes pulse {
-  0% {
-    transform: scale(1);
-    box-shadow: 0 0 0 0 rgba(0, 255, 0, 0.7);
-  }
-  70% {
-    transform: scale(1.02);
-    box-shadow: 0 0 10px 15px rgba(0, 255, 0, 0);
-  }
-  100% {
-    transform: scale(1);
-    box-shadow: 0 0 0 0 rgba(0, 255, 0, 0);
-  }
+@keyframes pulse-button {
+  0% { transform: scale(1); box-shadow: 0 0 5px 0 rgba(0, 255, 0, 0.7); }
+  70% { transform: scale(1.02); box-shadow: 0 0 15px 10px rgba(0, 255, 0, 0); }
+  100% { transform: scale(1); box-shadow: 0 0 5px 0 rgba(0, 255, 0, 0); }
 }
 
-/* --- Game Layout --- */
-
-body.game-active {
-  overflow: hidden; /* Prevent scrolling during game */
-} 
-
+/* --- ENHANCED: Game Layout --- */
 #game-wrapper {
-  display: none; /* Hidden until game starts */
+  display: none;
   flex-direction: column;
   align-items: center;
   justify-content: center;
@@ -139,84 +178,58 @@ body.game-active {
 }
 
 body.game-active #game-wrapper {
-  display: flex; /* This now correctly shows the wrapper */
+  display: flex;
+  /* NEW: Fade in the entire game UI */
+  animation: fadeIn 0.5s ease-in-out;
 }
 
-/* Flex container for controls and canvas */
 #game-content {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
   width: 100%;
   height: 100%;
-  padding: 0 15px;      /* Add padding to screen edges */
-  box-sizing: border-box; /* Include padding in width calculation */
 }
 
 #gameCanvas {
   display: block;
   aspect-ratio: 3/2;
   background-color: black;
-  /* KEY CHANGE: Let canvas be constrained by height and available width */
   max-height: 95vh;
-  /* Use 100% of the available flex space */
   max-width: 100%;
-  object-fit: contain; /* Scales down to fit while maintaining aspect ratio */
+  object-fit: contain;
+  /* NEW: Glowing effect for the game canvas */
+  border-radius: 5px;
+  box-shadow: 0 0 25px rgba(0, 255, 255, 0.5), 0 0 40px rgba(255, 0, 255, 0.3);
 }
 
-/* Position the HUD absolutely over the top of the game area */
+/* --- ENHANCED: HUD --- */
 #info-header {
   position: absolute;
-  top: 5px;
+  bottom: 10px; /* Changed from 'top' to 'bottom' */
   left: 50%;
   transform: translateX(-50%);
-  background: rgba(0, 0, 0, 0.5);
-  padding: 5px 10px;
+  background: rgba(13, 13, 26, 0.7);
+  padding: 8px 15px;
   border-radius: 10px;
   z-index: 10;
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--button-border);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
 }
 #info-header h1 {
   margin: 0 0 5px 0;
   font-size: clamp(16px, 2.5vw, 22px);
+  text-shadow: 0 0 3px var(--accent-cyan);
 }
 #hud {
   font-size: clamp(12px, 2vw, 16px);
   margin: 0;
 }
 
-/* --- On-Screen Controls --- */
-/* Make parent container wrap on small screens */
-#controls-left,
-#controls-right {
-  display: flex;
-  flex-wrap: wrap; /* Allow wrapping instead of overflow */
-}
-
-/* Ensure buttons never overflow the viewport */
-/* Ensure buttons are a fixed size */
-.controls button {
-  background-color: rgba(51, 51, 51, 0.7);
-  border: 2px solid #555;
-  color: #eee;
-  border-radius: 50%;
-  /* --- KEY CHANGE: Use fixed dimensions --- */
-  width: 70px;
-  height: 70px;
-  font-size: 30px;
-  /* --- End Key Change --- */
-  cursor: pointer;
-  user-select: none;
-  -webkit-tap-highlight-color: transparent;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-shrink: 0; /* Prevent buttons from shrinking */
-}
-
-
-/* --- Form Button --- */
-/* Hide the form button until the game is over */
+/* --- ENHANCED: Form Button --- */
 #formButton {
+  
   display: none;
   position: absolute;
   bottom: 20px;
@@ -224,11 +237,42 @@ body.game-active #game-wrapper {
   transform: translateX(-50%);
   padding: 15px 30px;
   font-size: 1.2rem;
-  font-family: "Orbitron", sans-serif;
-  background-color: #00ff00;
+  font-family: var(--font-main);
+  background-color: var(--accent-green);
   color: black;
   border: none;
   border-radius: 5px;
   z-index: 20;
   cursor: pointer;
+  /* NEW: Add transition and initial state for animation */
+  transition: all 0.3s ease-out;
+  opacity: 0;
+  transform: translateX(-50%) translateY(20px);
+}
+
+/* NEW: This class will be added by JS, but we can style its appearance */
+/* In your JS, when you set display to 'block', also add this class.
+   Since we can't do that, we'll animate its appearance when display becomes block.
+   We'll use a keyframe animation for when it appears.
+*/
+@keyframes pop-in {
+    from {
+        opacity: 0;
+        transform: translateX(-50%) translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
+}
+
+/* Apply the pop-in animation when the button is shown */
+#formButton[style*="display: block"] {
+    opacity: 1; /* Make sure it's visible for the animation */
+    animation: pop-in 0.5s ease-out forwards;
+}
+
+#formButton:hover {
+    transform: translateX(-50%) scale(1.1);
+    box-shadow: 0 0 20px var(--accent-green);
 }

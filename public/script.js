@@ -1,23 +1,32 @@
+/**
+ * @file Vent Chase Game Logic
+ * @description This file contains the complete logic for the Vent Chase game,
+ * including player movement, impostor AI, drawing, and game state management.
+ * Features tap-to-move for player control.
+ */
+
+// --- DOM and Rendering Context ---
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 
-// --- Game Configuration ---
-const PLAYER_MOVE_DURATION = 100;  // Player speed (lower is faster)
-const IMPOSTOR_MOVE_DURATION = 150; // Base impostor animation speed
-const IMPOSTOR_FLEE_ANIMATION_DURATION = 75;
-let IMPOSTOR_FLEE_MOVE_INTERVAL // Faster animation when fleeing
-let IMPOSTOR_MOVE_INTERVAL = 400; // ms between impostor moves
+// --- Core Game Configuration ---
+// NOTE: These values make the impostor very fast for a high-difficulty experience.
+const PLAYER_MOVE_DURATION = 100; // Player animation speed (lower is faster)
+const IMPOSTOR_MOVE_DURATION = 75; // Base impostor animation speed
+const IMPOSTOR_FLEE_ANIMATION_DURATION = 45; // Faster animation when fleeing
+const IMPOSTOR_MOVE_INTERVAL = 200; // ms between impostor moves
 const IMPOSTOR_FLEE_DISTANCE = 7; // How close player must be for impostor to flee
-// NEW CONSTRAINT: The impostor will not plot a path within this distance of the player.
-const IMPOSTOR_PATH_AVOID_DISTANCE = 3; 
+const IMPOSTOR_PATH_AVOID_DISTANCE = 3; // Impostor avoids plotting paths this close to the player
+const IMPOSTOR_VENT_TELEPORT_DELAY = 0; // Instant delay for vent teleportation.
+const IMPOSTOR_HUNT_CHANCE = 0.7; // 70% chance for the impostor to hunt a task instead of patrolling
 
 // --- Sound Effects ---
 const sounds = {
-    move: new Audio('sounds/move.mp3'),
-    task: new Audio('sounds/task.mp3'),
-    seal: new Audio('sounds/seal.mp3'),
-    win: new Audio('sounds/win.mp3'),
-    lose: new Audio('sounds/lose.mp3'),
+    move: new Audio("sounds/move.mp3"),
+    task: new Audio("sounds/task.mp3"),
+    seal: new Audio("sounds/seal.mp3"),
+    win: new Audio("sounds/win.mp3"),
+    lose: new Audio("sounds/lose.mp3"),
 };
 sounds.move.volume = 0.4;
 sounds.task.volume = 0.7;
@@ -28,128 +37,138 @@ let tasksCompleted = 0;
 let ventsSealed = 0;
 let startTime = Date.now();
 let gameOver = false;
-let isMoving = false;
-let isImpostorMoving = false;
+let isMoving = false; // Player's animation lock
+let isImpostorMoving = false; // Impostor's animation lock
+let playerTargetTile = null; // Stores {x, y} for tap-to-move
 
 // --- Timers & Intervals ---
 let timerInterval = null;
 let impostorMoveInterval = null;
 
-// --- Mobile Swipe Controls ---
-let touchStartX = null;
-let touchStartY = null;
-
+// --- The Game Map Layout ---
 let tileMap = [
-  "XXXXXXXXXXXXXXXXXXXXXXXXX",
-  "X   T       X    T      X",
-  "X XXXXXXXX XXX XXXXXXX XX",
-  "X V     X   X       X   X",
-  "X   XXX X XXXXXXX X XXX X",
-  "X X   X X   V   X X   X X",
-  "X X X X XXXXXXX X XXX X X",
-  "X X X   X     X     X X X",
-  "X XXXXX X XXX X XXXXX X X",
-  "X   V   X X I X X   V   X",
-  "XXXXXXX X XXX X XXXXXXX X",
-  "X       X     X       P X",
-  "X XXXXXXX XXX XXXXXXX XXX",
-  "X   T     X V       T   X",
-  "XXXXXXXXXXXXXXXXXXXXXXXXX",
+    "XXXXXXXXXXXXXXXXXXXXXXXXX",
+    "X   T     X   T     X",
+    "X XXXXXXXX XXX XXXXXXX XX",
+    "X V   X   X     X   X",
+    "X   XXX X XXXXXXX X XXX X",
+    "X X   X X   V   X X   X X",
+    "X X X X XXXXXXX X XXX X X",
+    "X X X   X     X     X X X",
+    "X XXXXX X XXX X XXXXX X X",
+    "X   V   X X I X X   V   X",
+    "XXXXXXX X XXX X XXXXXXX X",
+    "X       X     X       P X",
+    "X XXXXXXX XXX XXXXXXX XXX",
+    "X   T     X V     T   X",
+    "XXXXXXXXXXXXXXXXXXXXXXXXX",
 ];
 
 const rows = tileMap.length;
 const cols = tileMap[0].length;
-let tileSize = 32;
+let tileSize = 32; // This will be dynamically calculated
 
+// --- Character Objects ---
 let player = { x: 0, y: 0, screenX: 0, screenY: 0 };
 let impostor = { x: 0, y: 0, screenX: 0, screenY: 0 };
 
-// --- Main Game Functions ---
+// ================================================================================= //
+//                               MAIN GAME FUNCTIONS                                 //
+// ================================================================================= //
 
+/**
+ * Initializes the game state, parses the map to find player/impostor start positions.
+ */
 function setup() {
-  for (let y = 0; y < rows; y++) {
-    let rowArray = tileMap[y].split("");
-    for (let x = 0; x < cols; x++) {
-      if (rowArray[x] === "P") {
-        player.x = x;
-        player.y = y;
-        rowArray[x] = " ";
-      } else if (rowArray[x] === "I") {
-        impostor.x = x;
-        impostor.y = y;
-        rowArray[x] = " ";
-      }
+    for (let y = 0; y < rows; y++) {
+        let rowArray = tileMap[y].split("");
+        for (let x = 0; x < cols; x++) {
+            if (rowArray[x] === "P") {
+                player.x = x;
+                player.y = y;
+                rowArray[x] = " ";
+            } else if (rowArray[x] === "I") {
+                impostor.x = x;
+                impostor.y = y;
+                rowArray[x] = " ";
+            }
+        }
+        tileMap[y] = rowArray.join("");
     }
-    tileMap[y] = rowArray.join("");
-  }
-  player.screenX = player.x * tileSize;
-  player.screenY = player.y * tileSize;
-  impostor.screenX = impostor.x * tileSize;
-  impostor.screenY = impostor.y * tileSize;
+    // Set initial screen positions based on grid positions
+    player.screenX = player.x * tileSize;
+    player.screenY = player.y * tileSize;
+    impostor.screenX = impostor.x * tileSize;
+    impostor.screenY = impostor.y * tileSize;
 
-  resizeCanvas();
-  startTimers();
-  drawGrid();
+    resizeCanvas();
+    startTimers();
+    drawGrid();
 }
 
+/**
+ * Starts the game timer and the impostor's movement interval.
+ */
 function startTimers() {
-  startTime = Date.now();
-  updateTimer();
-  timerInterval = setInterval(updateTimer, 1000);
-  impostorMoveInterval = setInterval(moveImpostorAI, IMPOSTOR_MOVE_INTERVAL);
+    startTime = Date.now();
+    updateTimer();
+    timerInterval = setInterval(updateTimer, 1000);
+    impostorMoveInterval = setInterval(moveImpostorAI, IMPOSTOR_MOVE_INTERVAL);
 }
 
+/**
+ * Handles the end of the game, displaying a message and setting up the final button.
+ * @param {string} message - The win or loss message to display.
+ */
 function endGame(message) {
-  if (gameOver) return;
-  gameOver = true;
-  clearInterval(timerInterval);
-  clearInterval(impostorMoveInterval);
-  sounds.move.pause(); // Stop movement sounds
+    if (gameOver) return;
+    gameOver = true;
+    playerTargetTile = null; // Stop any automated movement
+    clearInterval(timerInterval);
+    clearInterval(impostorMoveInterval);
+    sounds.move.pause(); // Stop any lingering movement sounds
 
-  const endButton = document.getElementById('formButton');
+    const endButton = document.getElementById("formButton");
+    const isWin = message.includes("Caught") || message.includes("trapped");
 
-  // Check if the game message indicates a win or a loss
-  if (message.includes("Caught") || message.includes("trapped") || message.includes("win")) {
-      // --- PLAYER WON ---
-      sounds.win.play();
-      endButton.innerHTML = '📝 Proceed to Form';
-      endButton.onclick = () => {
-          // Make sure to replace with your actual form link
-          window.location.href = 'https://forms.gle/YOUR_FORM_LINK';
-      };
-  } else {
-      // --- PLAYER LOST ---
-      sounds.lose.play();
-      endButton.innerHTML = '🔄 Retry';
-      endButton.onclick = () => {
-          window.location.reload(); // Reloads the page to restart the game
-      };
-  }
+    if (isWin) {
+        sounds.win.play();
+        endButton.innerHTML = "📝 Proceed to Form";
+        endButton.onclick = () => (window.location.href = "https://forms.gle/YOUR_FORM_LINK");
+    } else {
+        sounds.lose.play();
+        endButton.innerHTML = "🔄 Retry";
+        endButton.onclick = () => window.location.reload();
+    }
 
-  // Show the newly configured button
-  endButton.style.display = 'block';
+    endButton.style.display = "block";
 
-  // Display the final message on the canvas
-  setTimeout(() => {
-    ctx.fillStyle = "rgba(0, 0, 0, 0.75)";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    ctx.fillStyle = "white";
-    ctx.font = `bold ${Math.floor(tileSize * 1.5)}px sans-serif`;
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
-    ctx.fillText(message, canvas.width / 2, canvas.height / 2);
-  }, 200);
+    // Display the final message over the canvas after a short delay
+    setTimeout(() => {
+        ctx.fillStyle = "rgba(0, 0, 0, 0.75)";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = "white";
+        ctx.font = `bold ${Math.floor(tileSize * 1.5)}px sans-serif`;
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText(message, canvas.width / 2, canvas.height / 2);
+    }, 200);
 }
 
-// --- Drawing and Display ---
-function resizeCanvas() {
-    const aspectRatio = 3 / 2; // width : height
+// ================================================================================= //
+//                              DRAWING AND DISPLAY                                  //
+// ================================================================================= //
 
-    // Available space from your existing constraints
-    const maxWidth = window.innerWidth * 0.64;
+/**
+ * Resizes the canvas to fit the window while maintaining a 3:2 aspect ratio.
+ * Also recalculates tileSize and character screen positions.
+ */
+function resizeCanvas() {
+    const aspectRatio = 3 / 2;
+    // UPDATED: Changed from 0.64 to 0.95 to use more screen space.
+    const maxWidth = window.innerWidth * 0.95;
     const maxHeight = window.innerHeight * 0.95;
 
-    // Calculate best fit for 3:2 ratio
     let width = maxWidth;
     let height = width / aspectRatio;
 
@@ -158,14 +177,11 @@ function resizeCanvas() {
         width = height * aspectRatio;
     }
 
-    // Apply to canvas
     canvas.width = width;
     canvas.height = height;
-
-    // Adjust tile size to fit the width (or height, depending on your grid)
     tileSize = Math.floor(width / cols);
 
-    // Update player and impostor screen positions
+    // Update screen positions to match the new tile size
     player.screenX = player.x * tileSize;
     player.screenY = player.y * tileSize;
     if (impostor) {
@@ -173,133 +189,196 @@ function resizeCanvas() {
         impostor.screenY = impostor.y * tileSize;
     }
 
-    // Redraw if game still active
     if (!gameOver) {
         drawGrid();
     }
 }
 
+/**
+ * Updates the HUD timer every second.
+ */
 function updateTimer() {
-  const elapsed = Math.floor((Date.now() - startTime) / 1000);
-  document.getElementById("timer").textContent = `Time: ${elapsed}s`;
+    const elapsed = Math.floor((Date.now() - startTime) / 1000);
+    document.getElementById("timer").textContent = `Time: ${elapsed}s`;
 }
 
+/**
+ * Clears and redraws the entire game grid, including tiles and characters.
+ */
 function drawGrid() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  for (let row = 0; row < rows; row++) {
-    for (let col = 0; col < cols; col++) {
-      const tile = tileMap[row][col];
-      const x = col * tileSize;
-      const y = row * tileSize;
-      switch (tile) {
-        case "X": ctx.fillStyle = "#444"; break;
-        case "V": ctx.fillStyle = "#555"; break;
-        case "T": ctx.fillStyle = "#2c2c2c"; break;
-        default: ctx.fillStyle = "#1e1e1e"; break;
-      }
-      ctx.fillRect(x, y, tileSize, tileSize);
-      ctx.font = `bold ${tileSize * 0.6}px sans-serif`;
-      ctx.textAlign = "center";
-      ctx.textBaseline = "middle";
-      if (tile === "V") {
-        ctx.fillStyle = "#0ff";
-        ctx.fillText("V", x + tileSize / 2, y + tileSize / 2);
-      }
-      if (tile === "T") {
-        ctx.fillStyle = "#0f0";
-        ctx.fillText("T", x + tileSize / 2, y + tileSize / 2);
-      }
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    for (let row = 0; row < rows; row++) {
+        for (let col = 0; col < cols; col++) {
+            const tile = tileMap[row][col];
+            const x = col * tileSize;
+            const y = row * tileSize;
+
+            // Draw tile background
+            switch (tile) {
+                case "X":
+                    ctx.fillStyle = "#444";
+                    break;
+                case "V":
+                    ctx.fillStyle = "#555";
+                    break;
+                case "T":
+                    ctx.fillStyle = "#2c2c2c";
+                    break;
+                default:
+                    ctx.fillStyle = "#1e1e1e";
+                    break;
+            }
+            ctx.fillRect(x, y, tileSize, tileSize);
+
+            // Draw tile text (V or T)
+            ctx.font = `bold ${tileSize * 0.6}px sans-serif`;
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            if (tile === "V") {
+                ctx.fillStyle = "#0ff"; // Cyan for Vent
+                ctx.fillText("V", x + tileSize / 2, y + tileSize / 2);
+            } else if (tile === "T") {
+                ctx.fillStyle = "#0f0"; // Green for Task
+                ctx.fillText("T", x + tileSize / 2, y + tileSize / 2);
+            }
+        }
     }
-  }
-  ctx.fillStyle = "blue";
-  ctx.beginPath();
-  ctx.arc(player.screenX + tileSize / 2, player.screenY + tileSize / 2, tileSize / 2 - 2, 0, Math.PI * 2);
-  ctx.fill();
-  if (impostor) {
-    ctx.fillStyle = "red";
+
+    // Draw Player
+    ctx.fillStyle = "blue";
     ctx.beginPath();
-    ctx.arc(impostor.screenX + tileSize / 2, impostor.screenY + tileSize / 2, tileSize / 2 - 2, 0, Math.PI * 2);
+    ctx.arc(player.screenX + tileSize / 2, player.screenY + tileSize / 2, tileSize / 2 - 2, 0, Math.PI * 2);
     ctx.fill();
-  }
+
+    // Draw Impostor (if not caught)
+    if (impostor) {
+        ctx.fillStyle = "red";
+        ctx.beginPath();
+        ctx.arc(impostor.screenX + tileSize / 2, impostor.screenY + tileSize / 2, tileSize / 2 - 2, 0, Math.PI * 2);
+        ctx.fill();
+    }
 }
 
-// --- Player Logic ---
+// ================================================================================= //
+//                                 PLAYER LOGIC                                      //
+// ================================================================================= //
 
+/**
+ * Handles manual directional input (keyboard), interrupting any automated movement.
+ * @param {number} dx - The change in x-coordinate (-1, 0, or 1).
+ * @param {number} dy - The change in y-coordinate (-1, 0, or 1).
+ */
 function handlePlayerInput(dx, dy) {
     if (isMoving || gameOver) return;
-    
+    playerTargetTile = null; // Cancel automated movement
     sounds.move.play();
     movePlayer(dx, dy);
 }
 
-function movePlayer(dx, dy) {
-  const newX = player.x + dx;
-  const newY = player.y + dy;
-  if (!isWalkable(newX, newY)) return;
-  
-  isMoving = true;
-  const startX = player.screenX;
-  const startY = player.screenY;
-  const endX = newX * tileSize;
-  const endY = newY * tileSize;
-  const animStartTime = performance.now();
-  player.x = newX;
-  player.y = newY;
+/**
+ * Processes automated movement towards the playerTargetTile.
+ */
+function processPathMovement() {
+    if (isMoving || gameOver || !playerTargetTile) return;
 
-  function animate(time) {
-    let t = (time - animStartTime) / PLAYER_MOVE_DURATION;
-    if (t > 1) t = 1;
-    player.screenX = startX + (endX - startX) * t;
-    player.screenY = startY + (endY - startY) * t;
-    drawGrid();
-    if (t < 1) {
-      requestAnimationFrame(animate);
-    } else {
-      player.screenX = endX;
-      player.screenY = endY;
-      isMoving = false;
-      checkPlayerInteraction();
-      checkGameEndConditions();
+    if (player.x === playerTargetTile.x && player.y === playerTargetTile.y) {
+        playerTargetTile = null;
+        return;
     }
-  }
-  requestAnimationFrame(animate);
+
+    const path = bfs(player, playerTargetTile);
+    if (path && path.length > 0) {
+        const nextStep = path[0];
+        const dx = nextStep.x - player.x;
+        const dy = nextStep.y - player.y;
+        sounds.move.play();
+        movePlayer(dx, dy);
+    } else {
+        playerTargetTile = null;
+    }
 }
 
-function checkPlayerInteraction() {
-  const tile = tileMap[player.y][player.x];
-  if (tile === "T" || tile === "V") {
-    if (tile === "T") {
-      tasksCompleted++;
-      document.getElementById("tasksCounter").textContent = `Tasks Completed: ${tasksCompleted}`;
-      sounds.task.play();
-    } else if (tile === "V") {
-      ventsSealed++;
-      document.getElementById("ventsCounter").textContent = `Vents Sealed: ${ventsSealed}`;
-      sounds.seal.play();
+/**
+ * Animates the player's movement from one tile to the next.
+ * @param {number} dx - The change in x-coordinate.
+ * @param {number} dy - The change in y-coordinate.
+ */
+function movePlayer(dx, dy) {
+    const newX = player.x + dx;
+    const newY = player.y + dy;
+    if (!isWalkable(newX, newY)) {
+        playerTargetTile = null; // Stop if we hit a wall
+        return;
     }
+
+    isMoving = true;
+    const startX = player.screenX;
+    const startY = player.screenY;
+    const endX = newX * tileSize;
+    const endY = newY * tileSize;
+    const animStartTime = performance.now();
+
+    player.x = newX;
+    player.y = newY;
+
+    function animate(time) {
+        let t = (time - animStartTime) / PLAYER_MOVE_DURATION;
+        if (t > 1) t = 1;
+
+        player.screenX = startX + (endX - startX) * t;
+        player.screenY = startY + (endY - startY) * t;
+        drawGrid();
+
+        if (t < 1) {
+            requestAnimationFrame(animate);
+        } else {
+            player.screenX = endX;
+            player.screenY = endY;
+            isMoving = false;
+            checkPlayerInteraction();
+            checkGameEndConditions();
+            processPathMovement();
+        }
+    }
+    requestAnimationFrame(animate);
+}
+
+/**
+ * Checks for and handles player interaction with tasks or vents on the current tile.
+ */
+function checkPlayerInteraction() {
+    const tile = tileMap[player.y][player.x];
+    if (tile !== "T" && tile !== "V") return;
+
+    if (tile === "T") {
+        tasksCompleted++;
+        document.getElementById("tasksCounter").textContent = `Tasks Completed: ${tasksCompleted}`;
+        sounds.task.play();
+    } else { // tile === "V"
+        ventsSealed++;
+        document.getElementById("ventsCounter").textContent = `Vents Sealed: ${ventsSealed}`;
+        sounds.seal.play();
+    }
+    // Remove the tile from the map
     const row = tileMap[player.y].split("");
     row[player.x] = " ";
     tileMap[player.y] = row.join("");
-  }
 }
 
-// --- Impostor AI ---
-/**
- * Finds all "interesting" empty tiles for the impostor to patrol to.
- * An interesting tile is not a dead end (i.e., has 3 or more walkable neighbors).
- */
+// ================================================================================= //
+//                                IMPOSTOR AI LOGIC                                  //
+// ================================================================================= //
+
 function findPatrolPoints() {
     const locations = [];
-    // Iterate through the inner part of the map, avoiding edges.
     for (let y = 1; y < rows - 1; y++) {
         for (let x = 1; x < cols - 1; x++) {
-            if (tileMap[y][x] === ' ') {
+            if (tileMap[y][x] === " ") {
                 let walkableNeighbors = 0;
                 if (isWalkable(x, y - 1)) walkableNeighbors++;
                 if (isWalkable(x, y + 1)) walkableNeighbors++;
                 if (isWalkable(x - 1, y)) walkableNeighbors++;
                 if (isWalkable(x + 1, y)) walkableNeighbors++;
-
                 if (walkableNeighbors >= 3) {
                     locations.push({ x, y });
                 }
@@ -317,26 +396,23 @@ function moveImpostorAI() {
     const vents = findAll("V");
     let path = null;
     let animationDuration = IMPOSTOR_MOVE_DURATION;
-    const isInFleeMode = distToPlayer <= IMPOSTOR_FLEE_DISTANCE || tasks.length === 0;
+    const isFleeing = distToPlayer <= IMPOSTOR_FLEE_DISTANCE || tasks.length === 0;
 
-    if (isInFleeMode) {
-        // Fleeing logic remains the same: find the safest vent.
-        IMPOSTOR_MOVE_INTERVAL = 200;
+    if (isFleeing) {
         animationDuration = IMPOSTOR_FLEE_ANIMATION_DURATION;
         if (vents.length > 0) {
             const bestVent = vents
-                .map(vent => ({ vent, score: distance(impostor, vent) - (distance(player, vent) * 1.5) }))
+                .map((vent) => ({
+                    vent,
+                    score: distance(impostor, vent) - distance(player, vent) * 1.5,
+                }))
                 .sort((a, b) => a.score - b.score)[0].vent;
             path = bfs(impostor, bestVent, player, IMPOSTOR_PATH_AVOID_DISTANCE);
         }
     } else {
-        // --- NEW BEHAVIOR SELECTION ---
-        IMPOSTOR_MOVE_INTERVAL = 400;
         animationDuration = IMPOSTOR_MOVE_DURATION;
         const actionChance = Math.random();
-
-        if (actionChance < 0.70 && tasks.length > 0) {
-            // 70% chance to HUNT for a task
+        if (actionChance < IMPOSTOR_HUNT_CHANCE && tasks.length > 0) {
             let shortestPath = null;
             for (const task of tasks) {
                 const p = bfs(impostor, task, player, IMPOSTOR_PATH_AVOID_DISTANCE);
@@ -346,15 +422,12 @@ function moveImpostorAI() {
             }
             path = shortestPath;
         } else {
-            // 30% chance to PATROL to a random intersection
             const patrolPoints = findPatrolPoints();
             if (patrolPoints.length > 0) {
-                const randomPatrolPoint = patrolPoints[Math.floor(Math.random() * patrolPoints.length)];
-                path = bfs(impostor, randomPatrolPoint, player, IMPOSTOR_PATH_AVOID_DISTANCE);
+                const randomPoint = patrolPoints[Math.floor(Math.random() * patrolPoints.length)];
+                path = bfs(impostor, randomPoint, player, IMPOSTOR_PATH_AVOID_DISTANCE);
             }
         }
-
-        // If patrolling fails to find a path, always fall back to hunting a task.
         if (!path && tasks.length > 0) {
             let shortestPath = null;
             for (const task of tasks) {
@@ -367,9 +440,8 @@ function moveImpostorAI() {
         }
     }
 
-    // Fallback "Panic" logic to ensure the impostor never stops
     if (!path) {
-        if (isInFleeMode) {
+        if (isFleeing) {
             const directions = [{ dx: 0, dy: -1 }, { dx: 1, dy: 0 }, { dx: 0, dy: 1 }, { dx: -1, dy: 0 }];
             let bestPanicMove = null;
             let maxDist = -1;
@@ -389,10 +461,9 @@ function moveImpostorAI() {
                 return;
             }
         } else if (tasks.length > 0) {
-            // Reckless hunt, ignoring player proximity
             let shortestPath = null;
             for (const task of tasks) {
-                const p = bfs(impostor, task);
+                const p = bfs(impostor, task, null, 0);
                 if (p && (!shortestPath || p.length < shortestPath.length)) {
                     shortestPath = p;
                 }
@@ -401,211 +472,229 @@ function moveImpostorAI() {
         }
     }
 
-    // Set the timer for the next move and execute the chosen path
     clearInterval(impostorMoveInterval);
-    impostorMoveInterval = setInterval(moveImpostorAI, IMPOSTOR_MOVE_INTERVAL);
-
+    const nextInterval = isFleeing ? 200 : IMPOSTOR_MOVE_INTERVAL;
+    impostorMoveInterval = setInterval(moveImpostorAI, nextInterval);
     if (path && path.length > 0) {
-        const target = path[0];
-        if (target.x === player.x && target.y === player.y) return;
-        animateImpostorMove(target.x, target.y, animationDuration);
+        const nextStep = path[0];
+        if (nextStep.x === player.x && nextStep.y === player.y) return;
+        animateImpostorMove(nextStep.x, nextStep.y, animationDuration);
     }
 }
+
 function animateImpostorMove(x, y, duration) {
-  isImpostorMoving = true;
-  const startX = impostor.screenX;
-  const startY = impostor.screenY;
-  const endX = x * tileSize;
-  const endY = y * tileSize;
-  const animStartTime = performance.now();
-  impostor.x = x;
-  impostor.y = y;
-  function animate(time) {
-    let t = (time - animStartTime) / duration;
-    if (t > 1) t = 1;
-    impostor.screenX = startX + (endX - startX) * t;
-    impostor.screenY = startY + (endY - startY) * t;
-    drawGrid();
-    if (t < 1) {
-      requestAnimationFrame(animate);
-    } else {
-      impostor.screenX = endX;
-      impostor.screenY = endY;
-      isImpostorMoving = false;
-      handleImpostorLanding();
-      checkGameEndConditions();
+    isImpostorMoving = true;
+    const startX = impostor.screenX;
+    const startY = impostor.screenY;
+    const endX = x * tileSize;
+    const endY = y * tileSize;
+    const animStartTime = performance.now();
+    impostor.x = x;
+    impostor.y = y;
+
+    function animate(time) {
+        let t = (time - animStartTime) / duration;
+        if (t > 1) t = 1;
+        impostor.screenX = startX + (endX - startX) * t;
+        impostor.screenY = startY + (endY - startY) * t;
+        drawGrid();
+        if (t < 1) {
+            requestAnimationFrame(animate);
+        } else {
+            impostor.screenX = endX;
+            impostor.screenY = endY;
+            isImpostorMoving = false;
+            handleImpostorLanding();
+            checkGameEndConditions();
+        }
     }
-  }
-  requestAnimationFrame(animate);
+    requestAnimationFrame(animate);
 }
 
 function handleImpostorLanding() {
-  const currentTile = tileMap[impostor.y][impostor.x];
-  if (currentTile === "T") {
-    const row = tileMap[impostor.y].split("");
-    row[impostor.x] = " ";
-    tileMap[impostor.y] = row.join("");
-  }
-  
-  const allTasks = findAll("T");
-  const allVents = findAll("V");
-  const isOnVent = allVents.some(v => v.x === impostor.x && v.y === impostor.y);
-  if (isOnVent) {
-    if (allTasks.length === 0) {
-      endGame("Impostor Escaped!");
-      return;
+    const currentTile = tileMap[impostor.y][impostor.x];
+    if (currentTile === "T") {
+        const row = tileMap[impostor.y].split("");
+        row[impostor.x] = " ";
+        tileMap[impostor.y] = row.join("");
     }
-    setTimeout(()=>{ const otherVents = allVents.filter(v => v.x !== impostor.x || v.y !== impostor.y);
-    if (otherVents.length > 0) {
-      const randomVent = otherVents[Math.floor(Math.random() * otherVents.length)];
-      impostor.x = randomVent.x;
-      impostor.y = randomVent.y;
-      impostor.screenX = impostor.x * tileSize;
-      impostor.screenY = impostor.y * tileSize;
-      drawGrid();
-    }}, 1000)
-   
-  }
+    const allTasks = findAll("T");
+    const allVents = findAll("V");
+    const isOnVent = allVents.some((v) => v.x === impostor.x && v.y === impostor.y);
+    if (isOnVent) {
+        if (allTasks.length === 0) {
+            endGame("Impostor Escaped!");
+            return;
+        }
+        setTimeout(() => {
+            const otherVents = allVents.filter((v) => v.x !== impostor.x || v.y !== impostor.y);
+            if (otherVents.length > 0) {
+                const randomVent = otherVents[Math.floor(Math.random() * otherVents.length)];
+                impostor.x = randomVent.x;
+                impostor.y = randomVent.y;
+                impostor.screenX = impostor.x * tileSize;
+                impostor.screenY = impostor.y * tileSize;
+                drawGrid();
+            }
+        }, IMPOSTOR_VENT_TELEPORT_DELAY);
+    }
 }
 
 function checkGameEndConditions() {
-  if (gameOver || !impostor) return;
-  if (player.x === impostor.x && player.y === impostor.y) {
-    impostor = null;
-    endGame("You Caught the Impostor!");
-    return;
-  }
-  const remainingTasks = findAll("T");
-  const remainingVents = findAll("V");
-  if (remainingTasks.length === 0 && remainingVents.length === 0) {
-    endGame("Impostor is trapped! You win!");
-    return;
-  }
+    if (gameOver || !impostor) return;
+    if (player.x === impostor.x && player.y === impostor.y) {
+        impostor = null;
+        endGame("You Caught the Impostor!");
+        return;
+    }
+    if (findAll("V").length === 0) {
+        endGame("Impostor is trapped! You win!");
+        return;
+    }
 }
 
-// --- Utility & Pathfinding ---
+// ================================================================================= //
+//                            UTILITY & PATHFINDING                                  //
+// ================================================================================= //
 
 function isWalkable(x, y) {
-  if (y < 0 || y >= rows || x < 0 || x >= cols) return false;
-  return tileMap[y][x] !== "X";
+    if (y < 0 || y >= rows || x < 0 || x >= cols) return false;
+    return tileMap[y][x] !== "X";
 }
 
 function distance(a, b) {
-  return Math.abs(a.x - b.x) + Math.abs(a.y - b.y);
+    return Math.abs(a.x - b.x) + Math.abs(a.y - b.y);
 }
 
 function findAll(char) {
-  const locations = [];
-  for (let y = 0; y < rows; y++) {
-    for (let x = 0; x < cols; x++) {
-      if (tileMap[y][x] === char) {
-        locations.push({ x, y });
-      }
+    const locations = [];
+    for (let y = 0; y < rows; y++) {
+        for (let x = 0; x < cols; x++) {
+            if (tileMap[y][x] === char) {
+                locations.push({ x, y });
+            }
+        }
     }
-  }
-  return locations;
+    return locations;
 }
 
-// REFACTORED: The pathfinding function is now "player-aware".
 function bfs(start, goal, player, avoidDistance) {
-  const queue = [{ x: start.x, y: start.y, path: [] }];
-  const visited = new Set([`${start.x},${start.y}`]);
-  const directions = [{ dx: 0, dy: -1 }, { dx: 1, dy: 0 }, { dx: 0, dy: 1 }, { dx: -1, dy: 0 }];
-
-  while (queue.length > 0) {
-    const { x, y, path } = queue.shift();
-    if (x === goal.x && y === goal.y) return path;
-
-    for (const { dx, dy } of directions) {
-      const nx = x + dx;
-      const ny = y + dy;
-      const key = `${nx},${ny}`;
-
-      // NEW CONSTRAINT: This check ensures the generated path is never too close to the player.
-      if (player && distance({ x: nx, y: ny }, player) <= avoidDistance) {
-        continue; // Skip this tile, it's too close.
-      }
-
-      if (isWalkable(nx, ny) && !visited.has(key)) {
-        visited.add(key);
-        const newPath = [...path, { x: nx, y: ny }];
-        queue.push({ x: nx, y: ny, path: newPath });
-      }
+    const queue = [{ x: start.x, y: start.y, path: [] }];
+    const visited = new Set([`${start.x},${start.y}`]);
+    const directions = [{ dx: 0, dy: -1 }, { dx: 1, dy: 0 }, { dx: 0, dy: 1 }, { dx: -1, dy: 0 }];
+    while (queue.length > 0) {
+        const { x, y, path } = queue.shift();
+        if (x === goal.x && y === goal.y) return path;
+        for (const { dx, dy } of directions) {
+            const nx = x + dx;
+            const ny = y + dy;
+            const key = `${nx},${ny}`;
+            if (player && avoidDistance > 0 && distance({ x: nx, y: ny }, player) <= avoidDistance) {
+                continue;
+            }
+            if (isWalkable(nx, ny) && !visited.has(key)) {
+                visited.add(key);
+                const newPath = [...path, { x: nx, y: ny }];
+                queue.push({ x: nx, y: ny, path: newPath });
+            }
+        }
     }
-  }
-  return null; // No valid path found
+    return null;
 }
 
-// --- Event Listeners ---
+// ================================================================================= //
+//                                EVENT LISTENERS                                    //
+// ================================================================================= //
 
-window.addEventListener('resize', resizeCanvas);
+window.addEventListener("resize", resizeCanvas);
 
 document.addEventListener("keydown", (e) => {
-  if (gameOver) return;
-  if (e.key === "ArrowUp" || e.key === "w") handlePlayerInput(0, -1);
-  else if (e.key === "ArrowDown" || e.key === "s") handlePlayerInput(0, 1);
-  else if (e.key === "ArrowLeft" || e.key === "a") handlePlayerInput(-1, 0);
-  else if (e.key === "ArrowRight" || e.key === "d") handlePlayerInput(1, 0);
+    if (gameOver) return;
+    switch (e.key) {
+        case "ArrowUp":
+        case "w":
+            handlePlayerInput(0, -1);
+            break;
+        case "ArrowDown":
+        case "s":
+            handlePlayerInput(0, 1);
+            break;
+        case "ArrowLeft":
+        case "a":
+            handlePlayerInput(-1, 0);
+            break;
+        case "ArrowRight":
+        case "d":
+            handlePlayerInput(1, 0);
+            break;
+    }
 });
 
-canvas.addEventListener("touchstart", (e) => {
-  e.preventDefault();
-  if (gameOver || e.touches.length !== 1) return;
-  touchStartX = e.touches[0].clientX;
-  touchStartY = e.touches[0].clientY;
-}, { passive: false });
+/**
+ * Handles a click or touch on the canvas to set a movement target.
+ * @param {MouseEvent|TouchEvent} event
+ */
+function handleCanvasInteraction(event) {
+    if (gameOver) return;
+    event.preventDefault();
 
-canvas.addEventListener("touchend", (e) => {
-  e.preventDefault();
-  if (gameOver || touchStartX === null) return;
-  
-  const touch = e.changedTouches[0];
-  const dx = touch.clientX - touchStartX;
-  const dy = touch.clientY - touchStartY;
-  const minDist = 30;
-  
-  if (Math.abs(dx) > minDist || Math.abs(dy) > minDist) {
-      if (Math.abs(dx) > Math.abs(dy)) {
-        handlePlayerInput(dx > 0 ? 1 : -1, 0);
-      } else {
-        handlePlayerInput(0, dy > 0 ? 1 : -1);
-      }
-  }
+    const rect = canvas.getBoundingClientRect();
+    let clientX, clientY;
 
-  touchStartX = null;
-  touchStartY = null;
-}, { passive: false });
+    if (event.touches) {
+        clientX = event.touches[0].clientX;
+        clientY = event.touches[0].clientY;
+    } else {
+        clientX = event.clientX;
+        clientY = event.clientY;
+    }
 
-// --- Start the game ---
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    const canvasX = (clientX - rect.left) * scaleX;
+    const canvasY = (clientY - rect.top) * scaleY;
 
-function setupAndStartGame() {
-    document.body.classList.add('game-active');
+    const gridX = Math.floor(canvasX / tileSize);
+    const gridY = Math.floor(canvasY / tileSize);
 
-    document.getElementById('up-btn').addEventListener('click', () => handlePlayerInput(0, -1));
-    document.getElementById('down-btn').addEventListener('click', () => handlePlayerInput(0, 1));
-    document.getElementById('left-btn').addEventListener('click', () => handlePlayerInput(-1, 0));
-    document.getElementById('right-btn').addEventListener('click', () => handlePlayerInput(1, 0));
-
-    setup();
+    if (isWalkable(gridX, gridY)) {
+        playerTargetTile = { x: gridX, y: gridY };
+        if (!isMoving) {
+             processPathMovement();
+        }
+    }
 }
 
-const startButton = document.getElementById('start-button');
-const startOverlay = document.getElementById('start-overlay');
+canvas.addEventListener("click", handleCanvasInteraction);
+canvas.addEventListener("touchstart", handleCanvasInteraction, { passive: false });
 
-startButton.addEventListener('click', async () => {
-    startOverlay.style.display = 'none';
-    
-    try {
-        if (document.documentElement.requestFullscreen) {
-            await document.documentElement.requestFullscreen();
+// ================================================================================= //
+//                                 GAME START                                        //
+// ================================================================================= //
+
+function setupAndStartGame() {
+    document.body.classList.add("game-active");
+    // UPDATED: Removed event listeners for non-existent buttons.
+    setup();
+}
+const startButton = document.getElementById("start-button");
+const startOverlay = document.getElementById("start-overlay");
+startButton.addEventListener(
+    "click",
+    async () => {
+        startOverlay.style.display = "none";
+        try {
+            if (document.documentElement.requestFullscreen) {
+                await document.documentElement.requestFullscreen();
+            }
+            if (screen.orientation && screen.orientation.lock) {
+                await screen.orientation.lock("landscape");
+            }
+            setupAndStartGame();
+        } catch (err) {
+            console.error("Could not activate landscape/fullscreen mode:", err);
+            alert("Could not switch to landscape/fullscreen automatically. Please rotate your device if possible. The game will now start.");
+            setupAndStartGame();
         }
-        if (screen.orientation && screen.orientation.lock) {
-            await screen.orientation.lock('landscape');
-        }
-        setupAndStartGame();
-    } catch (err) {
-        console.error("Could not activate landscape/fullscreen mode:", err);
-        alert("Could not switch to landscape fullscreen automatically. Please rotate your device if possible. The game will now start.");
-        setupAndStartGame();
-    }
-}, { once: true });
+    }, { once: true }
+);
