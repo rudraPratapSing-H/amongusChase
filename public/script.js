@@ -17,7 +17,7 @@ const IMPOSTOR_FLEE_ANIMATION_DURATION = 50; // Faster animation when fleeing
 const IMPOSTOR_MOVE_INTERVAL = 200; // ms between impostor moves
 const IMPOSTOR_FLEE_DISTANCE = 7; // How close player must be for impostor to flee
 const IMPOSTOR_PATH_AVOID_DISTANCE = 3; // Impostor avoids plotting paths this close to the player
-const IMPOSTOR_VENT_TELEPORT_DELAY = 0; // Instant delay for vent teleportation.
+const IMPOSTOR_VENT_TELEPORT_DELAY = 1500; // 1.5 second gap between teleporting
 const IMPOSTOR_HUNT_CHANCE = 0.7; // 70% chance for the impostor to hunt a task instead of patrolling
 
 // --- Sound Effects ---
@@ -251,7 +251,7 @@ function drawGrid() {
     ctx.fill();
 
     // Draw Impostor (if not caught)
-    if (impostor) {
+    if (impostor && !impostor.isHidden) {
         ctx.fillStyle = "red";
         ctx.beginPath();
         ctx.arc(impostor.screenX + tileSize / 2, impostor.screenY + tileSize / 2, tileSize / 2 - 2, 0, Math.PI * 2);
@@ -526,16 +526,23 @@ function handleImpostorLanding() {
             endGame("Impostor Escaped!");
             return;
         }
+        // Impostor disappears for 1.5 seconds before teleporting
+        const originalImpostor = { ...impostor };
+        impostor.isHidden = true;
+        drawGrid(); // Redraw to hide impostor
+
         setTimeout(() => {
-            const otherVents = allVents.filter((v) => v.x !== impostor.x || v.y !== impostor.y);
+            const otherVents = allVents.filter((v) => v.x !== originalImpostor.x || v.y !== originalImpostor.y);
             if (otherVents.length > 0) {
-                const randomVent = otherVents[Math.floor(Math.random() * otherVents.length)];
-                impostor.x = randomVent.x;
-                impostor.y = randomVent.y;
-                impostor.screenX = impostor.x * tileSize;
-                impostor.screenY = impostor.y * tileSize;
-                drawGrid();
+                const targetVent = otherVents[Math.floor(Math.random() * otherVents.length)];
+                impostor.x = targetVent.x;
+                impostor.y = targetVent.y;
+                impostor.screenX = targetVent.x * tileSize;
+                impostor.screenY = targetVent.y * tileSize;
             }
+            impostor.isHidden = false;
+            drawGrid(); // Redraw to show impostor again
+            checkGameEndConditions();
         }, IMPOSTOR_VENT_TELEPORT_DELAY);
     }
 }
