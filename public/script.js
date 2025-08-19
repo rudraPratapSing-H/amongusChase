@@ -49,16 +49,16 @@ let impostorMoveInterval = null;
 let tileMap = [
     "XXXXXXXXXXXXXXXXXXXXXXXXX",
     "X   T    V    T         X",
-    "X XXXXXXXX XXX XXXXXXX XX",
-    "X V   X         X   X",
+    "X XXXXXXXX XXX XXXVXXX XX",
+    "X V   X         X  PX",
     "X   XXX X XXXXXXX X XXX X",
     "X X   X X   V   X X   X X",
     "X X X X XXXXXXX X XXX X X",
     "X X X   X     X     X X X",
     "X XXXXX X XXX X XXXXX X X",
-    "X   V   X X I X X   V   X",
-    "XXXXXXX X XXX X XXXXXXX X",
-    "X       X     X       P X",
+    "X   V   X V I X X   V   X",
+    "XXXX XX X XXX X XXXXXXX X",
+    "X       X     X         X",
     "X XXXXXXX XXX XXXXXXX XXX",
     "X   T     X V     T   X",
     "XXXXXXXXXXXXXXXXXXXXXXXXX",
@@ -682,6 +682,7 @@ const startOverlay = document.getElementById("start-overlay");
 startButton.addEventListener(
     "click",
     async () => {
+        sounds.move.play(); 
         startOverlay.style.display = "none";
         try {
             if (document.documentElement.requestFullscreen) {
