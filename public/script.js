@@ -12,8 +12,8 @@ const ctx = canvas.getContext("2d");
 // --- Core Game Configuration ---
 // NOTE: These values make the impostor very fast for a high-difficulty experience.
 const PLAYER_MOVE_DURATION = 100; // Player animation speed (lower is faster)
-const IMPOSTOR_MOVE_DURATION = 75; // Base impostor animation speed
-const IMPOSTOR_FLEE_ANIMATION_DURATION = 45; // Faster animation when fleeing
+const IMPOSTOR_MOVE_DURATION =60; // Base impostor animation speed
+const IMPOSTOR_FLEE_ANIMATION_DURATION = 40; // Faster animation when fleeing
 const IMPOSTOR_MOVE_INTERVAL = 200; // ms between impostor moves
 const IMPOSTOR_FLEE_DISTANCE = 7; // How close player must be for impostor to flee
 const IMPOSTOR_PATH_AVOID_DISTANCE = 3; // Impostor avoids plotting paths this close to the player
@@ -164,7 +164,7 @@ function endGame(message) {
  * Also recalculates tileSize and character screen positions.
  */
 function resizeCanvas() {
-    const aspectRatio = 3 / 2;
+    const aspectRatio = 932 / 621;
     // UPDATED: Changed from 0.64 to 0.95 to use more screen space.
     const maxWidth = window.innerWidth * 0.95;
     const maxHeight = window.innerHeight * 0.95;
