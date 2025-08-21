@@ -565,10 +565,11 @@ function handleImpostorLanding() {
     const allRedTasks = findAll("R");
     const allVents = findAll("V");
     const isOnVent = allVents.some((v) => v.x === impostor.x && v.y === impostor.y);
-
+    let flag = false;
     // NEW: If half or more tasks are sabotaged, warn the player
     const totalTasks = allTasks.length + allRedTasks.length;
-    if (totalTasks > 0 && allRedTasks.length >= Math.ceil(totalTasks / 2)) {
+    if (totalTasks > 0 && allRedTasks.length >= Math.ceil(totalTasks / 2) && !flag) {
+        flag = true;
         showPopup("If the Saboteur sabotages all tasks, they will escape through the vents. Undo the sabotaged (red) tasks to prevent their escape.", 3500);
     }
 
