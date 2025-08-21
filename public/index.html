@@ -1,89 +1,131 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
-    <title>Vent Chase</title>
-    <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Vent Chase - The Story</title>
+    <link rel="stylesheet" href="story_style.css">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&family=Roboto:wght@400&display=swap" rel="stylesheet">
-
 </head>
-
 <body>
-<div id="popup-modal" style="display:none;">
-  <div id="popup-content">
-    <span id="popup-message"></span>
-  </div>
-</div>
-<div id="start-overlay">
-  <div id="rules-container">
-    <h1>// SYSTEM ALERT //</h1>
-    <h2>Mission Briefing: Vent Chase</h2>
-    <p>
-      You are the last <strong>Crewmate (🔵)</strong> on high alert. A rogue <strong>Saboteur (🔴)</strong> is compromising the station. Your mission is to neutralize the threat before it escapes and dooms us all.
-    </p>
 
-    <hr>
-
-    <h3>Your Directives:</h3>
-    <ul>
-      <li><strong>Reboot Systems (T):</strong> Move over the green terminals ('T') to restore critical functions.</li>
-      <li><strong>Seal Vents (V):</strong> Lock down the cyan maintenance vents ('V') to cut off the Saboteur's escape routes.</li>
-    </ul>
-
-    <h3>Threat Analysis: The Saboteur</h3>
-    <ul>
-      <li>It will actively <strong>sabotage</strong> your progress by taking repaired systems offline.</li>
-      <li>It uses the vent network to <strong>teleport</strong> instantly across the station.</li>
-      <li>It is evasive and will flee to a vent if you get too close.</li>
-    </ul>
-
-    <hr>
-
-    <h2>Mission Success Conditions 🏆</h2>
-    <p>There are two paths to victory. If one fails, attempt the other.</p>
-    
-    <h4>1. Direct Apprehension</h4>
-    <p>Corner the Saboteur and move onto its tile to capture it. This is difficult, as it's programmed to evade you.</p>
-
-    <h4>2. Strategic Containment</h4>
-    <p>
-      If you can't catch it, <strong>TRAP IT</strong>. This is the key. By sealing the vents, you limit its mobility. If you <strong>reboot all systems AND seal all vents</strong>, you'll leave it with nowhere to run.
-    </p>
-
-    <h3>Mission Failure ☠️</h3>
-    <p>If you reboot all systems but the Saboteur escapes through an <strong>unsealed vent</strong>, the mission is lost.</p>
-    
-    <div class="controls-section">
-        <h3>Field Controls</h3>
-        <p><strong>🖱️ Tap / Click:</strong> Point to any open tile for auto-pathing.</p>
-        <p><strong>⌨️ Keyboard (WASD / Arrows):</strong> For precise, manual navigation.</p>
-    </div>
-
-    <p class="form-notice"><strong>Note:</strong> You must win the game to unlock the Debriefing <b>Form</b>.</p>
-
-    <button id="start-button">Engage</button>
-  </div>
-</div>
-
-<div id="game-wrapper">
-    <div id="game-content">
-        <canvas id="gameCanvas" height="400" width="600"></canvas>
+<div class="story-container">
+    <div class="image-container" id="image-container">
+        <!-- Images will be dynamically added here by JavaScript -->
     </div>
     
-    <div id="info-header">
-        <h1>🚨 Vent Chase</h1>
-        <div id="hud">
-            <span id="tasksCounter">🧹 Systems: 0</span> |
-            <span id="ventsCounter">🕳️ Vents: 0</span> |
-            <span id="timer">⏱️ Time: 0s</span>
-        </div>
+    <div class="dialogue-box">
+        <p class="story-text" id="story-text-element"></p>
+        <button id="nav-button">Next</button>
     </div>
-    
-    <button id="formButton" onclick="window.location.href='https://docs.google.com/forms/d/e/1FAIpQLSeF5yvyqYh6CrKAMW7uFT257aCfXfgVdDUpYn7IMZtEWonoZA/viewform?usp=dialog'">📝 Proceed to Form</button>
 </div>
 
-<script src="script.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // --- Story Content ---
+        // Each object represents a scene with its image and text.
+        const scenes = [
+            {
+                image: 'images/Scen_1.jpg',
+                text: 'In the cold silence of space, a shadow hides among the stars. An alien impostor boards the vessel, disguised as one of the crew.'
+            },
+            {
+                image: 'images/Scen_2.jpg',
+                text: 'At first, no one suspects. But soon—systems fail, engines sputter, and trust fractures. The impostor strikes without mercy… one by one, the crew falls.'
+            },
+            {
+                image: 'images/Scen_3.jpg',
+                text: 'When the last breath fades, the impostor claims the ship’s heart—the reactor core. With alarms wailing across empty halls, the predator prepares its escape.'
+            },
+            {
+                image: 'images/Scen_4.jpg',
+                text: 'Yet… all is not lost. Deep within the ship, a stasis pod hisses open. A lone crewmate awakens, ready to fight back against the impostor.'
+            },
+            {
+                image: 'images/Scen_5.jpg',
+                text: 'They find the silence of death… the journal of a fallen friend… and the truth of betrayal.'
+            },
+            {
+                image: 'images/Scen_6.jpg',
+                text: 'Now armed and resolute,the survivor rises with a single mission:'
+            },
+            {
+                image: 'images/Scen_7.jpg',
+                text: 'Hunt the impostor. Stop its escape. Avenge the crew… or die as the last casualty.'
+            }
+        ];
+
+        // --- DOM Elements ---
+        const imageContainer = document.getElementById('image-container');
+        const storyTextElement = document.getElementById('story-text-element');
+        const navButton = document.getElementById('nav-button');
+
+        let currentSceneIndex = 0;
+
+        // --- Functions ---
+
+        /**
+         * Pre-loads all scene images into the DOM and sets them to be hidden.
+         */
+        function initializeImages() {
+            scenes.forEach((scene, index) => {
+                const img = document.createElement('img');
+                img.src = scene.image;
+                img.alt = `Scene ${index + 1}`;
+                img.classList.add('scene-image');
+                // Add a fallback in case an image fails to load
+                img.onerror = () => {
+                    img.src = `https://placehold.co/800x600/0d0d1a/00ffff?text=Scene+${index+1}+Not+Found`;
+                };
+                imageContainer.appendChild(img);
+            });
+        }
+
+        /**
+         * Displays a specific scene by its index.
+         * @param {number} index - The index of the scene to show.
+         */
+        function showScene(index) {
+            // Update image visibility
+            const allImages = document.querySelectorAll('.scene-image');
+            allImages.forEach((img, imgIndex) => {
+                if (imgIndex === index) {
+                    img.classList.add('active');
+                } else {
+                    img.classList.remove('active');
+                }
+            });
+
+            // Update text
+            storyTextElement.textContent = scenes[index].text;
+
+            // Update button
+            if (index === scenes.length - 1) {
+                navButton.textContent = 'Begin Mission';
+            } else {
+                navButton.textContent = 'Next';
+            }
+        }
+
+        // --- Event Listeners ---
+
+        navButton.addEventListener('click', () => {
+            if (currentSceneIndex < scenes.length - 1) {
+                // If not the last scene, advance to the next one
+                currentSceneIndex++;
+                showScene(currentSceneIndex);
+            } else {
+                // If on the last scene, clicking "Begin Mission" goes to the game
+                // *** THIS LINE HAS BEEN UPDATED ***
+                window.location.href = 'main_game.html?from=story';
+            }
+        });
+
+        // --- Initial Setup ---
+        initializeImages();
+        showScene(0); // Show the first scene on page load
+    });
+</script>
 
 </body>
 </html>
