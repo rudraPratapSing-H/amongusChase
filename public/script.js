@@ -48,7 +48,7 @@ let impostorMoveInterval = null;
 // --- The Game Map Layout ---
 let tileMap = [
     "XXXXXXXXXXXXXXXXXXXXXXXXX",
-    "X   T    V    T         X",
+    "X   T    V              X",
     "X XXXXXXXX XXX XXXVXXX XX",
     "X V   X     T   X  PX",
     "X   XXX X XXXXXXX X XXX X",
@@ -58,9 +58,9 @@ let tileMap = [
     "X XXXXX X XXX X XXXXX X X",
     "X   V   X V I X X   V   X",
     "XXXX XX X XXX X XXXXXXX X",
-    "X    T  X     X         X",
+    "X       X     X         X",
     "X XXXXXXX XXX XXXXXXX XXX",
-    "X   T     X V     T   X",
+    "X   T     X V         X",
     "XXXXXXXXXXXXXXXXXXXXXXXXX",
 ];
 
@@ -224,13 +224,16 @@ function drawGrid() {
                 case "T":
                     ctx.fillStyle = "#2c2c2c";
                     break;
+                case "R":
+                    ctx.fillStyle = "#2c2c2c";
+                    break;
                 default:
                     ctx.fillStyle = "#1e1e1e";
                     break;
             }
             ctx.fillRect(x, y, tileSize, tileSize);
 
-            // Draw tile text (V or T)
+            // Draw tile text (V, T, or R)
             ctx.font = `bold ${tileSize * 0.6}px sans-serif`;
             ctx.textAlign = "center";
             ctx.textBaseline = "middle";
@@ -239,6 +242,9 @@ function drawGrid() {
                 ctx.fillText("V", x + tileSize / 2, y + tileSize / 2);
             } else if (tile === "T") {
                 ctx.fillStyle = "#0f0"; // Green for Task
+                ctx.fillText("T", x + tileSize / 2, y + tileSize / 2);
+            } else if (tile === "R") {
+                ctx.fillStyle = "#f00"; // Red for sabotaged Task
                 ctx.fillText("T", x + tileSize / 2, y + tileSize / 2);
             }
         }
@@ -249,13 +255,23 @@ function drawGrid() {
     ctx.beginPath();
     ctx.arc(player.screenX + tileSize / 2, player.screenY + tileSize / 2, tileSize / 2 - 2, 0, Math.PI * 2);
     ctx.fill();
+    // Label "You"
+    ctx.fillStyle = "#fff";
+    ctx.font = `bold ${tileSize * 0.35}px sans-serif`;
+    ctx.textAlign = "center";
+    ctx.fillText("You", player.screenX + tileSize / 2, player.screenY + tileSize - 6);
 
-    // Draw Impostor (if not caught)
+    // Draw Saboteur (Impostor)
     if (impostor && !impostor.isHidden) {
         ctx.fillStyle = "red";
         ctx.beginPath();
         ctx.arc(impostor.screenX + tileSize / 2, impostor.screenY + tileSize / 2, tileSize / 2 - 2, 0, Math.PI * 2);
         ctx.fill();
+        // Label "Saboteur"
+        ctx.fillStyle = "#fff";
+        ctx.font = `bold ${tileSize * 0.35}px sans-serif`;
+        ctx.textAlign = "center";
+        ctx.fillText("Saboteur", impostor.screenX + tileSize / 2, impostor.screenY + tileSize - 6);
     }
 }
 
@@ -348,21 +364,26 @@ function movePlayer(dx, dy) {
  */
 function checkPlayerInteraction() {
     const tile = tileMap[player.y][player.x];
-    if (tile !== "T" && tile !== "V") return;
-
     if (tile === "T") {
-        tasksCompleted++;
-        document.getElementById("tasksCounter").textContent = `Tasks Completed: ${tasksCompleted}`;
+        // Player crosses normal task: do NOT remove, do NOT increment tasksCompleted
+        // Optionally, you can play a sound or give feedback
+        // sounds.task.play();
+    } else if (tile === "R") {
+        // Player crosses sabotaged (red) task: revert to normal
+        const row = tileMap[player.y].split("");
+        row[player.x] = "T";
+        tileMap[player.y] = row.join("");
         sounds.task.play();
-    } else { // tile === "V"
+    } else if (tile === "V") {
         ventsSealed++;
         document.getElementById("ventsCounter").textContent = `Vents Sealed: ${ventsSealed}`;
         sounds.seal.play();
+        // Remove the vent from the map
+        const row = tileMap[player.y].split("");
+        row[player.x] = " ";
+        tileMap[player.y] = row.join("");
     }
-    // Remove the tile from the map
-    const row = tileMap[player.y].split("");
-    row[player.x] = " ";
-    tileMap[player.y] = row.join("");
+    // No removal for "T" or "R" tiles by player
 }
 
 // ================================================================================= //
@@ -514,13 +535,24 @@ function animateImpostorMove(x, y, duration) {
 function handleImpostorLanding() {
     const currentTile = tileMap[impostor.y][impostor.x];
     if (currentTile === "T") {
+        // Impostor sabotages the task: turn it into a red task
         const row = tileMap[impostor.y].split("");
-        row[impostor.x] = " ";
+        row[impostor.x] = "R";
         tileMap[impostor.y] = row.join("");
     }
+    // If impostor lands on a red task, do nothing
+
     const allTasks = findAll("T");
+    const allRedTasks = findAll("R");
     const allVents = findAll("V");
     const isOnVent = allVents.some((v) => v.x === impostor.x && v.y === impostor.y);
+
+    // NEW: If all tasks are sabotaged (red), impostor escapes
+    if (allTasks.length === 0 && allRedTasks.length > 0) {
+        endGame("Impostor Escaped! All systems sabotaged.");
+        return;
+    }
+
     if (isOnVent) {
         if (allTasks.length === 0) {
             endGame("Impostor Escaped!");
@@ -736,3 +768,14 @@ startButton.addEventListener(
         }
     }, { once: true }
 );
+
+// pop up modal
+
+function showPopup(message, duration = 2000) {
+    document.getElementById("popup-message").textContent = message;
+    const modal = document.getElementById("popup-modal");
+    modal.style.display = "flex";
+    setTimeout(() => {
+        modal.style.display = "none";
+    }, duration);
+}

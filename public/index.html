@@ -7,48 +7,63 @@
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&family=Roboto:wght@400&display=swap" rel="stylesheet">
 </head>
+<!-- pop up modal -->
+<div id="popup-modal" style="display:none;">
+  <div id="popup-content">
+    <span id="popup-message"></span>
+  </div>
+</div>
+<!-- filepath: c:\Users\maced\OneDrive\Projects\amongusGame\public\index.html -->
 <body>
 
 <div id="start-overlay">
   <div id="rules-container">
-    <h1>🚨 Vent Chase</h1>
-    <h2>How to Play</h2>
-    <p>You are the <strong>blue character</strong>. Your goal is to outsmart and defeat the <strong>red impostor</strong> before it escapes.</p>
+    <h1>// SYSTEM ALERT //</h1>
+    <h2>Mission Briefing: Vent Chase</h2>
+    <p>
+      You are the last <strong>Crewmate (🔵)</strong> on high alert. A rogue <strong>Saboteur (🔴)</strong> is compromising the station. Your mission is to neutralize the threat before it escapes and dooms us all.
+    </p>
 
-    <h3>Controls</h3>
+    <hr>
+
+    <h3>Your Directives:</h3>
     <ul>
-        <li><strong>Tap / Click:</strong> The easiest way to play! Simply tap (on mobile) or click (on desktop) any open tile, and your character will automatically move there.</li>
-        <li><strong>Keyboard:</strong> For precise, step-by-step movement, you can also use the <strong>Arrow Keys</strong> or <strong>WASD</strong> on a desktop computer.</li>
+      <li><strong>Reboot Systems (T):</strong> Move over the green terminals ('T') to restore critical functions.</li>
+      <li><strong>Seal Vents (V):</strong> Lock down the cyan maintenance vents ('V') to cut off the Saboteur's escape routes.</li>
+    </ul>
+
+    <h3>Threat Analysis: The Saboteur</h3>
+    <ul>
+      <li>It will actively <strong>sabotage</strong> your progress by taking repaired systems offline.</li>
+      <li>It uses the vent network to <strong>teleport</strong> instantly across the station.</li>
+      <li>It is evasive and will flee to a vent if you get too close.</li>
     </ul>
 
     <hr>
 
-    <h2>Rules & Objectives</h2>
-    <h3>Your Mission ✅</h3>
-    <ul>
-        <li><strong>Complete Tasks (T):</strong> When you pass through a green task tile ('T'), you complete it.</li>
-        <li><strong>Seal Vents (V):</strong> When you pass through a cyan vent tile ('V'), you seal it.</li>
-    </ul>
+    <h2>Mission Success Conditions 🏆</h2>
+    <p>There are two paths to victory. If one fails, attempt the other.</p>
+    
+    <h4>1. Direct Apprehension</h4>
+    <p>Corner the Saboteur and move onto its tile to capture it. This is difficult, as it's programmed to evade you.</p>
 
-    <h3>The Impostor 🔴</h3>
-    <ul>
-        <li>When it passes through a task ('T'), it <strong>destroys</strong> it.</li>
-        <li>When it passes through a vent ('V'), it exits from another random vent.</li>
-        <li>It gets scared and runs to a vent if you get too close.</li>
-    </ul>
+    <h4>2. Strategic Containment</h4>
+    <p>
+      If you can't catch it, <strong>TRAP IT</strong>. This is the key. By sealing the vents, you limit its mobility. If you <strong>reboot all systems AND seal all vents</strong>, you'll leave it with nowhere to run.
+    </p>
 
-    <h3>How to Win 🏆</h3>
-    <ol>
-        <li><strong>Catch the Impostor</strong> by moving onto its tile.(sometimes the impostor dodges)</li>
-        <li><strong>Trap the Impostor</strong> by completing all tasks AND sealing all vents.</li>
-    </ol>
+    <h3>Mission Failure ☠️</h3>
+    <p>If you reboot all systems but the Saboteur escapes through an <strong>unsealed vent</strong>, the mission is lost.</p>
+    
+    <div class="controls-section">
+        <h3>Field Controls</h3>
+        <p><strong>🖱️ Tap / Click:</strong> Point to any open tile for auto-pathing.</p>
+        <p><strong>⌨️ Keyboard (WASD / Arrows):</strong> For precise, manual navigation.</p>
+    </div>
 
-    <h3>How to Lose ☠️</h3>
-    <p>You lose if the impostor escapes through a vent <strong>after</strong> all tasks are completed.</p>
+    <p class="form-notice"><strong>Note:</strong> You must win the game to unlock the Debriefing <b>Form</b>.</p>
 
-    <p class="form-notice"><strong>Note:</strong> You must win the game to unlock the <b>Form</b>.</p>
-
-    <button id="start-button">Start Game</button>
+    <button id="start-button">Engage</button>
   </div>
 </div>
 
@@ -60,7 +75,7 @@
     <div id="info-header">
         <h1>🚨 Vent Chase</h1>
         <div id="hud">
-            <span id="tasksCounter">🧹 Tasks: 0</span> |
+            <span id="tasksCounter">🧹 Systems: 0</span> |
             <span id="ventsCounter">🕳️ Vents: 0</span> |
             <span id="timer">⏱️ Time: 0s</span>
         </div>

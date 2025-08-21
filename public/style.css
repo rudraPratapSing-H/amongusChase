@@ -276,3 +276,23 @@ body.game-active #game-wrapper {
     transform: translateX(-50%) scale(1.1);
     box-shadow: 0 0 20px var(--accent-green);
 }
+
+
+#popup-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 99999;
+}
+#popup-content {
+  background: var(--button-bg, #222);
+  color: var(--primary-text, #fff);
+  padding: 2em;
+  border-radius: 12px;
+  box-shadow: 0 0 20px #00ffff88;
+  text-align: center;
+  min-width: 220px;
+}
