@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Vent Chase - The Story</title>
+    <link rel="stylesheet" href="story_style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&family=Roboto:wght@400&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<div class="story-container">
+    <div class="image-container" id="image-container">
+        <!-- Images will be dynamically added here by JavaScript -->
+    </div>
+    
+    <div class="dialogue-box">
+        <p class="story-text" id="story-text-element"></p>
+        <button id="nav-button">Next</button>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // --- Story Content ---
+        // Each object represents a scene with its image and text.
+        const scenes = [
+            {
+                image: 'images/Scen_1.jpg',
+                text: 'The station drifts in silence, its corridors bathed in the cold glow of emergency lights.'
+            },
+            {
+                image: 'images/Scen_2.jpg',
+                text: 'You are the last crewmate, awakened by alarms and the distant echo of sabotage. Somewhere in the shadows, a rogue saboteur moves with purpose, disabling vital systems and plotting escape through the labyrinth of vents.'
+            },
+            {
+                image: 'images/Scen_3.jpg',
+                text: 'Every terminal you restore, every vent you seal, brings you closer to containing the threat. But the saboteur is cunning—turning your progress against you, sabotaging systems, and vanishing in a flash of red. The fate of the station rests on your vigilance and strategy.'
+            },
+            {
+                image: 'images/Scen_4.jpg',
+                text: 'Will you outsmart the saboteur, trapping it with sealed vents and restored systems? Or will it slip away, leaving the station doomed and your mission failed? The chase begins now.'
+            }
+        ];
+
+        // --- DOM Elements ---
+        const imageContainer = document.getElementById('image-container');
+        const storyTextElement = document.getElementById('story-text-element');
+        const navButton = document.getElementById('nav-button');
+
+        let currentSceneIndex = 0;
+
+        // --- Functions ---
+
+        /**
+         * Pre-loads all scene images into the DOM and sets them to be hidden.
+         */
+        function initializeImages() {
+            scenes.forEach((scene, index) => {
+                const img = document.createElement('img');
+                img.src = scene.image;
+                img.alt = `Scene ${index + 1}`;
+                img.classList.add('scene-image');
+                // Add a fallback in case an image fails to load
+                img.onerror = () => {
+                    img.src = `https://placehold.co/800x600/0d0d1a/00ffff?text=Scene+${index+1}+Not+Found`;
+                };
+                imageContainer.appendChild(img);
+            });
+        }
+
+        /**
+         * Displays a specific scene by its index.
+         * @param {number} index - The index of the scene to show.
+         */
+        function showScene(index) {
+            // Update image visibility
+            const allImages = document.querySelectorAll('.scene-image');
+            allImages.forEach((img, imgIndex) => {
+                if (imgIndex === index) {
+                    img.classList.add('active');
+                } else {
+                    img.classList.remove('active');
+                }
+            });
+
+            // Update text
+            storyTextElement.textContent = scenes[index].text;
+
+            // Update button
+            if (index === scenes.length - 1) {
+                navButton.textContent = 'Begin Mission';
+            } else {
+                navButton.textContent = 'Next';
+            }
+        }
+
+        // --- Event Listeners ---
+
+        navButton.addEventListener('click', () => {
+            if (currentSceneIndex < scenes.length - 1) {
+                // If not the last scene, advance to the next one
+                currentSceneIndex++;
+                showScene(currentSceneIndex);
+            } else {
+                // If on the last scene, clicking "Begin Mission" goes to the game
+                // *** THIS LINE HAS BEEN UPDATED ***
+                window.location.href = 'index.html?from=story';
+            }
+        });
+
+        // --- Initial Setup ---
+        initializeImages();
+        showScene(0); // Show the first scene on page load
+    });
+</script>
+
+</body>
+</html>

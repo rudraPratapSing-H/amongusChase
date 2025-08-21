@@ -676,6 +676,36 @@ canvas.addEventListener("click", handleCanvasInteraction);
 canvas.addEventListener("touchstart", handleCanvasInteraction, { passive: false });
 
 // ================================================================================= //
+//                            STORY INTRO INTEGRATION                              //
+// ================================================================================= //
+
+/**
+ * This code checks if the player has arrived from the story intro page.
+ * If so, it bypasses the rules overlay and starts the game immediately.
+ */
+document.addEventListener('DOMContentLoaded', () => {
+    // Create a URLSearchParams object to easily read the URL's query string
+    const params = new URLSearchParams(window.location.search);
+
+    // Check if the 'from' parameter exists and is set to 'story'
+    if (params.get('from') === 'story') {
+        const startOverlay = document.getElementById("start-overlay");
+        const startButton = document.getElementById("start-button");
+        
+        // Hide the overlay immediately
+        if (startOverlay) {
+            startOverlay.style.display = "none";
+        }
+
+        // Trigger the game start logic directly, as if the button were clicked
+        if (startButton) {
+            // We can call the game start function directly for a smoother transition
+            setupAndStartGame();
+        }
+    }
+});
+
+// ================================================================================= //
 //                                 GAME START                                        //
 // ================================================================================= //
 
