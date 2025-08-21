@@ -114,6 +114,20 @@ function startTimers() {
     updateTimer();
     timerInterval = setInterval(updateTimer, 1000);
     impostorMoveInterval = setInterval(moveImpostorAI, IMPOSTOR_MOVE_INTERVAL);
+    
+    setTimeout(()=>{
+        if (!gameOver) showPopup("Restore green tasks that have been sabotaged and turned red.", 2500);
+    }, 7000)
+    // After 30 seconds, show vent sealing tip if game not over
+    setTimeout(() => {
+        if (!gameOver) showPopup("Move through vents to seal them and prevent the Saboteur from escaping.", 3000);
+    }, 15000);
+
+    // After 45 seconds, show trapping tip if game not over
+    setTimeout(() => {
+        if (!gameOver) showPopup("Seal all vents to trap the Saboteur and secure victory.", 3000);
+    }, 50000);
+    
 }
 
 /**
@@ -539,6 +553,11 @@ function handleImpostorLanding() {
         const row = tileMap[impostor.y].split("");
         row[impostor.x] = "R";
         tileMap[impostor.y] = row.join("");
+        // Show popup only on first sabotage
+        if (!window._impostorFirstSabotage) {
+            // showPopup("Restore green tasks that have been sabotaged and turned red.", 2500);
+            window._impostorFirstSabotage = true;
+        }
     }
     // If impostor lands on a red task, do nothing
 
@@ -547,7 +566,13 @@ function handleImpostorLanding() {
     const allVents = findAll("V");
     const isOnVent = allVents.some((v) => v.x === impostor.x && v.y === impostor.y);
 
-    // NEW: If all tasks are sabotaged (red), impostor escapes
+    // NEW: If half or more tasks are sabotaged, warn the player
+    const totalTasks = allTasks.length + allRedTasks.length;
+    if (totalTasks > 0 && allRedTasks.length >= Math.ceil(totalTasks / 2)) {
+        showPopup("If the Saboteur sabotages all tasks, they will escape through the vents. Undo the sabotaged (red) tasks to prevent their escape.", 3500);
+    }
+
+    // If all tasks are sabotaged (red), impostor escapes
     if (allTasks.length === 0 && allRedTasks.length > 0) {
         endGame("Impostor Escaped! All systems sabotaged.");
         return;
@@ -586,10 +611,7 @@ function checkGameEndConditions() {
         endGame("You Caught the Impostor!");
         return;
     }
-    if (findAll("V").length === 0) {
-        endGame("Impostor is trapped! You win!");
-        return;
-    }
+    
 }
 
 // ================================================================================= //
@@ -713,8 +735,13 @@ canvas.addEventListener("touchstart", handleCanvasInteraction, { passive: false 
 
 function setupAndStartGame() {
     document.body.classList.add("game-active");
-    // UPDATED: Removed event listeners for non-existent buttons.
     setup();
+    // Show initial popups with improved English
+    showPopup("Tap a location to move your character there.", 2200);
+    setTimeout(() => showPopup("Pursue the Saboteur!", 2000), 2300);
+
+    // Track impostor's first sabotage
+    window._impostorFirstSabotage = false;
 }
 const startButton = document.getElementById("start-button");
 const startOverlay = document.getElementById("start-overlay");
