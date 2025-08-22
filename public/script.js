@@ -8,6 +8,7 @@
 // --- DOM and Rendering Context ---
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
+let flag = false;
 
 // --- Core Game Configuration ---
 // NOTE: These values make the impostor very fast for a high-difficulty experience.
@@ -22,6 +23,7 @@ const IMPOSTOR_HUNT_CHANCE = 0.7; // 70% chance for the impostor to hunt a task 
 
 // --- Sound Effects ---
 const sounds = {
+    tap: new Audio("sounds/tap.mp3"),
     move: new Audio("sounds/move.mp3"),
     task: new Audio("sounds/task.mp3"),
     seal: new Audio("sounds/seal.mp3"),
@@ -31,6 +33,7 @@ const sounds = {
 sounds.move.volume = 0.4;
 sounds.task.volume = 0.7;
 sounds.seal.volume = 0.8;
+sounds.tap.volume = 0.6;
 
 // --- Game State ---
 let tasksCompleted = 0;
@@ -56,10 +59,10 @@ let tileMap = [
     "X X X X XXXXXXX X XXX X X",
     "X X X   X  T  X     X X X",
     "X XXXXX X XXX X XXXXX X X",
-    "X   V   X V I X X   V   X",
+    "X   V     V I X     V   X",
     "XXXX XX X XXX X XXXXXXX X",
     "X       X     X         X",
-    "X XXXXXXX XXX XXXXXXX XXX",
+    "X XXXXX X XXX XXXXXXX XXX",
     "X   T     X V         X",
     "XXXXXXXXXXXXXXXXXXXXXXXXX",
 ];
@@ -178,7 +181,7 @@ function endGame(message) {
  * Also recalculates tileSize and character screen positions.
  */
 function resizeCanvas() {
-    const aspectRatio = 932 / 621;
+    const aspectRatio = 25 / 15;
     // UPDATED: Changed from 0.64 to 0.95 to use more screen space.
     const maxWidth = window.innerWidth * 0.95;
     const maxHeight = window.innerHeight * 0.95;
@@ -265,7 +268,7 @@ function drawGrid() {
     }
 
     // Draw Player
-    ctx.fillStyle = "blue";
+    ctx.fillStyle = "yellow";
     ctx.beginPath();
     ctx.arc(player.screenX + tileSize / 2, player.screenY + tileSize / 2, tileSize / 2 - 2, 0, Math.PI * 2);
     ctx.fill();
@@ -273,7 +276,7 @@ function drawGrid() {
     ctx.fillStyle = "#fff";
     ctx.font = `bold ${tileSize * 0.35}px sans-serif`;
     ctx.textAlign = "center";
-    ctx.fillText("You", player.screenX + tileSize / 2, player.screenY + tileSize - 6);
+    // ctx.fillText("You", player.screenX + tileSize / 2, player.screenY + tileSize - 6);
 
     // Draw Saboteur (Impostor)
     if (impostor && !impostor.isHidden) {
@@ -285,7 +288,7 @@ function drawGrid() {
         ctx.fillStyle = "#fff";
         ctx.font = `bold ${tileSize * 0.35}px sans-serif`;
         ctx.textAlign = "center";
-        ctx.fillText("Saboteur", impostor.screenX + tileSize / 2, impostor.screenY + tileSize - 6);
+        // ctx.fillText("Saboteur", impostor.screenX + tileSize / 2, impostor.screenY + tileSize - 6);
     }
 }
 
@@ -565,17 +568,23 @@ function handleImpostorLanding() {
     const allRedTasks = findAll("R");
     const allVents = findAll("V");
     const isOnVent = allVents.some((v) => v.x === impostor.x && v.y === impostor.y);
-    let flag = false;
+    
+    console.log(flag)
     // NEW: If half or more tasks are sabotaged, warn the player
     const totalTasks = allTasks.length + allRedTasks.length;
     if (totalTasks > 0 && allRedTasks.length >= Math.ceil(totalTasks / 2) && !flag) {
-        flag = true;
-        showPopup("If the Saboteur sabotages all tasks, they will escape through the vents. Undo the sabotaged (red) tasks to prevent their escape.", 3500);
+       
+        console.log(flag)
+        showPopup("If the Saboteur sabotages all tasks, they will escape through the vents. Undo the sabotaged (red) tasks to prevent their escape.", 4000);
+         setTimeout(() => {
+            flag = true;
+        }, 4000);
+        
     }
 
     // If all tasks are sabotaged (red), impostor escapes
-    if (allTasks.length === 0 && allRedTasks.length > 0) {
-        endGame("Impostor Escaped! All systems sabotaged.");
+    if (allTasks.length === 0 && allRedTasks.length > 0 && isOnVent) {
+        endGame("Impostor Escaped!");
         return;
     }
 
@@ -702,7 +711,8 @@ function handleCanvasInteraction(event) {
 
     const rect = canvas.getBoundingClientRect();
     let clientX, clientY;
-
+    sounds.tap.currentTime = 0;
+    sounds.tap.play();
     if (event.touches) {
         clientX = event.touches[0].clientX;
         clientY = event.touches[0].clientY;

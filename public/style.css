@@ -179,36 +179,47 @@ body::after {
 
 body.game-active #game-wrapper {
   display: flex;
-  /* NEW: Fade in the entire game UI */
   animation: fadeIn 0.5s ease-in-out;
+}
+
+#game-flex {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  width: 100%;
+  height: 100%;
 }
 
 #game-content {
   display: flex;
   justify-content: center;
   align-items: center;
+  padding: 16px;
   width: 100%;
-  height: 100%;
+  height: auto;
 }
 
 #gameCanvas {
+  margin-top: 36px;
   display: block;
-  aspect-ratio: 3/2;
+  aspect-ratio: 25/15;
   background-color: black;
-  max-height: 95vh;
-  max-width: 100%;
+  max-width: 95vw;
+  max-height: 70vh;
   object-fit: contain;
-  /* NEW: Glowing effect for the game canvas */
   border-radius: 5px;
   box-shadow: 0 0 25px rgba(0, 255, 255, 0.5), 0 0 40px rgba(255, 0, 255, 0.3);
 }
 
 /* --- ENHANCED: HUD --- */
 #info-header {
-  position: absolute;
-  bottom: 10px; /* Changed from 'top' to 'bottom' */
-  left: 50%;
-  transform: translateX(-50%);
+  position: static;
+  display: flex;
+  flex-direction: row;
+  margin-top: 0%;
+  margin-bottom: 12px;
   background: rgba(13, 13, 26, 0.7);
   padding: 8px 15px;
   border-radius: 10px;
@@ -229,7 +240,6 @@ body.game-active #game-wrapper {
 
 /* --- ENHANCED: Form Button --- */
 #formButton {
-  
   display: none;
   position: absolute;
   bottom: 20px;
@@ -275,9 +285,7 @@ body.game-active #game-wrapper {
 #formButton:hover {
     transform: translateX(-50%) scale(1.1);
     box-shadow: 0 0 20px var(--accent-green);
-}
-
-
+  }
 
   #popup-modal {
           position: fixed;
@@ -303,3 +311,121 @@ body.game-active #game-wrapper {
           min-width: 220px;
           pointer-events: auto; /* Allows pointer events on the popup itself if needed */
         }
+
+        /* --- Responsive Improvements for Mobile --- */
+@media (max-width: 900px) {
+  #game-wrapper {
+    padding: 0;
+    min-height: 100dvh;
+    height: 100dvh;
+    width: 100vw;
+  }
+  #game-flex {
+    gap: 10px;
+    width: 100vw;
+    height: 100dvh;
+  }
+  #game-content {
+    padding: 6px;
+    width: 100vw;
+    min-height: 40vh;
+  }
+  #gameCanvas {
+    margin-top: 16px;
+    max-width: 99vw;
+    max-height: 45vh;
+    border-radius: 8px;
+    font-size: 0.9em;
+  }
+  #info-header {
+    font-size: 1em;
+    padding: 4px 6px;
+    margin-bottom: 8px;
+    flex-direction: column;
+    align-items: center;
+    width: 98vw;
+    border-radius: 8px;
+  }
+  #hud {
+    font-size: 1em;
+    margin-top: 2px;
+  }
+  #formButton {
+    font-size: 1em;
+    padding: 10px 18px;
+    bottom: 10px;
+  }
+  #popup-content {
+    margin-top: 16px;
+    min-width: 160px;
+    font-size: 0.95em;
+    padding: 0.7em 1em;
+  }
+  #start-overlay {
+    padding: 8px;
+  }
+  #rules-container {
+    padding: 10px;
+    max-width: 98vw;
+    font-size: 1em;
+    border-radius: 10px;
+  }
+}
+
+@media (max-width: 600px) {
+  #game-wrapper {
+    min-height: 100dvh;
+    height: 100dvh;
+    width: 100vw;
+  }
+  #game-flex {
+    gap: 6px;
+    width: 100vw;
+    height: 100dvh;
+  }
+  #game-content {
+    padding: 2px;
+    width: 100vw;
+    min-height: 30vh;
+  }
+  #gameCanvas {
+    margin-top: 8px;
+    max-width: 99vw;
+    max-height: 35vh;
+    border-radius: 8px;
+    font-size: 0.85em;
+  }
+  #info-header {
+    font-size: 0.95em;
+    padding: 3px 4px;
+    margin-bottom: 4px;
+    flex-direction: column;
+    align-items: center;
+    width: 99vw;
+    border-radius: 8px;
+  }
+  #hud {
+    font-size: 0.95em;
+    margin-top: 2px;
+  }
+  #formButton {
+    font-size: 0.95em;
+    padding: 8px 12px;
+    bottom: 6px;
+  }
+  #popup-content {
+    margin-top: 8px;
+    min-width: 120px;
+    font-size: 0.9em;
+    padding: 0.5em 0.7em;
+  }
+  #start-overlay {
+    padding: 4px;
+  }
+  #rules-container {
+    padding: 6px;
+    max-width: 99vw;
+    font-size: 0.95em;
+    border-radius: 8px;
+  }
+}
