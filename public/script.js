@@ -13,8 +13,8 @@ let flag = false;
 // --- Core Game Configuration ---
 // NOTE: These values make the impostor very fast for a high-difficulty experience.
 const PLAYER_MOVE_DURATION = 110; // Player animation speed (lower is faster)
-const IMPOSTOR_MOVE_DURATION =90; // Base impostor animation speed
-const IMPOSTOR_FLEE_ANIMATION_DURATION = 65; // Faster animation when fleeing
+let IMPOSTOR_MOVE_DURATION =90; // Base impostor animation speed
+let IMPOSTOR_FLEE_ANIMATION_DURATION = 65; // Faster animation when fleeing
 const IMPOSTOR_MOVE_INTERVAL = 200; // ms between impostor moves
 const IMPOSTOR_FLEE_DISTANCE = 7; // How close player must be for impostor to flee
 const IMPOSTOR_PATH_AVOID_DISTANCE = 3; // Impostor avoids plotting paths this close to the player
@@ -119,16 +119,16 @@ function startTimers() {
     impostorMoveInterval = setInterval(moveImpostorAI, IMPOSTOR_MOVE_INTERVAL);
     
     setTimeout(()=>{
-        if (!gameOver) showPopup("Restore green tasks that have been sabotaged and turned red.", 2500);
+        if (!gameOver) showPopup("Restore green tasks (T) that have been sabotaged and turned red.", 2500);
     }, 7000)
     // After 30 seconds, show vent sealing tip if game not over
     setTimeout(() => {
-        if (!gameOver) showPopup("Move through vents to seal them and prevent the Saboteur from escaping.", 3000);
+        if (!gameOver) showPopup("Move through vents (V) to seal them and prevent the Saboteur from escaping.", 3000);
     }, 15000);
 
     // After 45 seconds, show trapping tip if game not over
     setTimeout(() => {
-        if (!gameOver) showPopup("Seal all vents to trap the Saboteur and secure victory.", 3000);
+        if (!gameOver) showPopup("Seal all vents to trap the Saboteur (red ball) and secure victory.", 3000);
     }, 50000);
     
 }
@@ -706,12 +706,14 @@ document.addEventListener("keydown", (e) => {
  * @param {MouseEvent|TouchEvent} event
  */
 function handleCanvasInteraction(event) {
-    if (gameOver) return;
+    if (gameOver || window.popupActive) return;
     event.preventDefault();
 
     const rect = canvas.getBoundingClientRect();
     let clientX, clientY;
     sounds.tap.currentTime = 0;
+    IMPOSTOR_MOVE_DURATION = 90; // Base impostor animation speed
+    IMPOSTOR_FLEE_ANIMATION_DURATION = 65;
     sounds.tap.play();
     if (event.touches) {
         clientX = event.touches[0].clientX;
@@ -779,7 +781,7 @@ function setupAndStartGame() {
     setup();
     // Show initial popups with improved English
     showPopup("Tap a location to move your character there.", 2200);
-    setTimeout(() => showPopup("Pursue the Saboteur!", 2000), 2300);
+   
 
     // Track impostor's first sabotage
     window._impostorFirstSabotage = false;
@@ -809,11 +811,46 @@ startButton.addEventListener(
 
 // pop up modal
 
-function showPopup(message, duration = 2000) {
+function showPopup(message) {
     document.getElementById("popup-message").textContent = message;
     const modal = document.getElementById("popup-modal");
     modal.style.display = "flex";
+
+    // Pause game timers and movement
+    let wasPaused = false;
+    if (!gameOver) {
+        clearInterval(timerInterval);
+        clearInterval(impostorMoveInterval);
+        IMPOSTOR_MOVE_DURATION = 9000000; // Base impostor animation speed
+        IMPOSTOR_FLEE_ANIMATION_DURATION = 9000000;
+        wasPaused = true;
+       window.disableClick = true;
+    }
     setTimeout(() => {
+        if (!gameOver && wasPaused) {
+            window.disableClick = false;
+        }
+    }, 1500);
+
+    // Block player movement and input while popup is visible
+    window.popupActive = true;
+
+    // Wait for user to click/tap anywhere to dismiss popup and resume game
+    function resumeGame() {
         modal.style.display = "none";
-    }, duration);
+        document.removeEventListener("mousedown", resumeGame);
+        document.removeEventListener("touchstart", resumeGame);
+        IMPOSTOR_MOVE_DURATION = 90; // Base impostor animation speed
+        IMPOSTOR_FLEE_ANIMATION_DURATION = 65;
+        window.popupActive = false;
+
+        // Resume timers and movement
+        if (wasPaused && !gameOver) {
+            timerInterval = setInterval(updateTimer, 1000);
+            impostorMoveInterval = setInterval(moveImpostorAI, IMPOSTOR_MOVE_INTERVAL);
+        }
+    }
+
+    document.addEventListener("mousedown", resumeGame);
+    document.addEventListener("dblclick", resumeGame);
 }
