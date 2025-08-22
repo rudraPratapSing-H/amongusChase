@@ -174,6 +174,11 @@ function endGame(message) {
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
         ctx.fillText(message, canvas.width / 2, canvas.height / 2);
+
+        // Add "Game by Rudra Pratap Singh" below the message
+        ctx.font = `bold ${Math.floor(tileSize * 0.6)}px sans-serif`;
+        ctx.fillStyle = "#00ffff";
+        ctx.fillText("Game by Rudra Pratap Singh", canvas.width / 2, canvas.height / 2 + tileSize * 1.2);
     }, 200);
 }
 // ================================================================================= //
@@ -771,8 +776,7 @@ canvas.addEventListener("click", handleCanvasInteraction);
 canvas.addEventListener("touchstart", handleCanvasInteraction, { passive: false });
 
 // ================================================================================= //
-//                            STORY INTRO INTEGRATION                              //
-// ================================================================================= //
+//                            STORY INTRO INTEGRATION                              // ================================================================================= //
 
 /**
  * This code checks if the player has arrived from the story intro page.
