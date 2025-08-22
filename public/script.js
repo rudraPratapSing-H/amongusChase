@@ -8,6 +8,7 @@
 // --- DOM and Rendering Context ---
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
+let flag = false;
 
 // --- Core Game Configuration ---
 // NOTE: These values make the impostor very fast for a high-difficulty experience.
@@ -56,10 +57,10 @@ let tileMap = [
     "X X X X XXXXXXX X XXX X X",
     "X X X   X  T  X     X X X",
     "X XXXXX X XXX X XXXXX X X",
-    "X   V   X V I X X   V   X",
+    "X   V     V I X     V   X",
     "XXXX XX X XXX X XXXXXXX X",
     "X       X     X         X",
-    "X XXXXXXX XXX XXXXXXX XXX",
+    "X XXXXX X XXX XXXXXXX XXX",
     "X   T     X V         X",
     "XXXXXXXXXXXXXXXXXXXXXXXXX",
 ];
@@ -178,7 +179,7 @@ function endGame(message) {
  * Also recalculates tileSize and character screen positions.
  */
 function resizeCanvas() {
-    const aspectRatio = 932 / 621;
+    const aspectRatio = 25 / 15;
     // UPDATED: Changed from 0.64 to 0.95 to use more screen space.
     const maxWidth = window.innerWidth * 0.95;
     const maxHeight = window.innerHeight * 0.95;
@@ -565,17 +566,23 @@ function handleImpostorLanding() {
     const allRedTasks = findAll("R");
     const allVents = findAll("V");
     const isOnVent = allVents.some((v) => v.x === impostor.x && v.y === impostor.y);
-    let flag = false;
+    
+    console.log(flag)
     // NEW: If half or more tasks are sabotaged, warn the player
     const totalTasks = allTasks.length + allRedTasks.length;
     if (totalTasks > 0 && allRedTasks.length >= Math.ceil(totalTasks / 2) && !flag) {
-        flag = true;
-        showPopup("If the Saboteur sabotages all tasks, they will escape through the vents. Undo the sabotaged (red) tasks to prevent their escape.", 3500);
+       
+        console.log(flag)
+        showPopup("If the Saboteur sabotages all tasks, they will escape through the vents. Undo the sabotaged (red) tasks to prevent their escape.", 4000);
+         setTimeout(() => {
+            flag = true;
+        }, 4000);
+        
     }
 
     // If all tasks are sabotaged (red), impostor escapes
-    if (allTasks.length === 0 && allRedTasks.length > 0) {
-        endGame("Impostor Escaped! All systems sabotaged.");
+    if (allTasks.length === 0 && allRedTasks.length > 0 && isOnVent) {
+        endGame("Impostor Escaped!");
         return;
     }
 
