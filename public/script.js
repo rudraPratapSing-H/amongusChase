@@ -80,6 +80,13 @@ let impostor = { x: 0, y: 0, screenX: 0, screenY: 0 };
 // ================================================================================= //
 
 /**
+ * Generates a random string to use as a security token.
+ */
+function generateToken() {
+    return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+}
+
+/**
  * Initializes the game state, parses the map to find player/impostor start positions.
  */
 function setup() {
@@ -151,7 +158,17 @@ function endGame(message) {
     if (isWin) {
         sounds.win.play();
         endButton.innerHTML = "📝 Proceed to Form";
-        endButton.onclick = () => (window.location.href = "https://docs.google.com/forms/d/e/1FAIpQLSeF5yvyqYh6CrKAMW7uFT257aCfXfgVdDUpYn7IMZtEWonoZA/viewform?usp=dialog");
+
+        // NEW: Token generation logic
+        const winToken = generateToken(); // Create a new token
+        localStorage.setItem("secureFormToken", winToken); // Save it to the browser's memory
+
+        // NEW: Update the button's click action to use the token
+        // Make sure 'protected.html' is the name of your protected form file
+        endButton.onclick = () => {
+        window.location.href = `protected.html?token=${winToken}`; 
+    };
+
     } else {
         sounds.lose.play();
         endButton.innerHTML = "🔄 Retry";
@@ -171,7 +188,6 @@ function endGame(message) {
         ctx.fillText(message, canvas.width / 2, canvas.height / 2);
     }, 200);
 }
-
 // ================================================================================= //
 //                              DRAWING AND DISPLAY                                  //
 // ================================================================================= //
