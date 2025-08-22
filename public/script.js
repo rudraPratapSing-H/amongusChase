@@ -12,7 +12,7 @@ let flag = false;
 
 // --- Core Game Configuration ---
 // NOTE: These values make the impostor very fast for a high-difficulty experience.
-const PLAYER_MOVE_DURATION = 90; // Player animation speed (lower is faster)
+const PLAYER_MOVE_DURATION = 60; // Player animation speed (lower is faster)
 let IMPOSTOR_MOVE_DURATION =90; // Base impostor animation speed
 let IMPOSTOR_FLEE_ANIMATION_DURATION = 65; // Faster animation when fleeing
 const IMPOSTOR_MOVE_INTERVAL = 200; // ms between impostor moves
