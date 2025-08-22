@@ -112,33 +112,14 @@ function setup() {
     impostor.screenY = impostor.y * tileSize;
 
     resizeCanvas();
-    startTimers();
+    
     drawGrid();
 }
 
 /**
  * Starts the game timer and the impostor's movement interval.
  */
-function startTimers() {
-    startTime = Date.now();
-    updateTimer();
-    timerInterval = setInterval(updateTimer, 1000);
-    impostorMoveInterval = setInterval(moveImpostorAI, IMPOSTOR_MOVE_INTERVAL);
-    
-    setTimeout(()=>{
-        if (!gameOver) showPopup("Restore green tasks (T) that have been sabotaged and turned red.", 2500);
-    }, 7000)
-    // After 30 seconds, show vent sealing tip if game not over
-    setTimeout(() => {
-        if (!gameOver) showPopup("Move through vents (V) to seal them and prevent the Saboteur from escaping.", 3000);
-    }, 15000);
 
-    // After 45 seconds, show trapping tip if game not over
-    setTimeout(() => {
-        if (!gameOver) showPopup("Seal all vents to trap the Saboteur (red ball) and secure victory.", 3000);
-    }, 50000);
-    
-}
 
 /**
  * Handles the end of the game, displaying a message and setting up the final button.
@@ -258,10 +239,7 @@ function forceFullscreenPrompt() {
 /**
  * Updates the HUD timer every second.
  */
-function updateTimer() {
-    const elapsed = Math.floor((Date.now() - startTime) / 1000);
-    document.getElementById("timer").textContent = `Time: ${elapsed}s`;
-}
+
 
 /**
  * Clears and redraws the entire game grid, including tiles and characters.
@@ -833,6 +811,7 @@ function setupAndStartGame() {
 
     // Track impostor's first sabotage
     window._impostorFirstSabotage = false;
+    impostorMoveInterval = setInterval(moveImpostorAI, IMPOSTOR_MOVE_INTERVAL);
 }
 const startButton = document.getElementById("start-button");
 const startOverlay = document.getElementById("start-overlay");
@@ -867,18 +846,16 @@ function showPopup(message, duration = 500) {
     window.popupActive = true;
     document.body.classList.add("popup-active");
 
-    if (!gameOver && window.popupActive) {
-        
-        clearInterval(impostorMoveInterval); // Stop impostor movement
+    // Pause impostor movement while popup is active
+    if (!gameOver) {
+        clearInterval(impostorMoveInterval);
     }
 
     setTimeout(() => {
         window.popupActive = false;
         document.body.classList.remove("popup-active");
-        I
-        // Restart impostor movement
+        // Resume impostor movement after popup closes
         if (!gameOver) {
-            clearInterval(impostorMoveInterval);
             impostorMoveInterval = setInterval(moveImpostorAI, IMPOSTOR_MOVE_INTERVAL);
         }
 
