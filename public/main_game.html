@@ -17,20 +17,33 @@
 <div id="start-overlay">
   <div id="rules-container">
     <h1>Vent Chase</h1>
-    <p>
-      <strong>You</strong> (🔵) must stop the <strong>Saboteur</strong> (🔴) from escaping!
-    </p>
+    <h2>How to Play</h2>
+    <p><strong>You (<span class="player">🟡</span>)</strong> must chase and stop the <strong><span class="saboteur">Saboteur (🔴)</span></strong> before they escape!</p>
+    
+    <h3>How the Game Works</h3>
     <ul>
-      <li>Move over <strong>green tasks (T)</strong> to keep systems online.</li>
-      <li>Fix <strong>red tasks</strong> sabotaged by the Saboteur.</li>
-      <li>Seal <strong>cyan vents (V)</strong> to block escape routes.</li>
+      <li>Click anywhere on the map to move to that spot.</li>
+      <li>The <span class="saboteur">Saboteur</span> moves randomly and tries to run away from you.</li>
+      <li>There are <strong><span class="task">tasks (T)</span></strong> on the map. The <span class="saboteur">Saboteur</span> sabotages them by stepping on them.</li>
+      <li>Fix sabotaged <span class="task">tasks</span> by moving over them.</li>
+      <li>There are <strong><span class="vent">vents (V)</span></strong>. The <span class="saboteur">Saboteur</span> can teleport between <span class="vent">vents</span> and escape through one if you don’t stop them.</li>
+      <li><strong>Tip:</strong> Move over a <span class="vent">vent</span> to seal it. Once sealed, the <span class="saboteur">Saboteur</span> cannot use that vent, making escape harder.</li>
     </ul>
-    <p>
-      <strong>Win:</strong> Catch the Saboteur or seal all vents.<br>
-      <strong>Lose:</strong> If all tasks are sabotaged and the Saboteur escapes.
-    </p>
+
+    <h3>Win</h3>
+    <ul>
+      <li>Catch the <span class="saboteur">Saboteur</span>.</li>
+      <li>Or seal/block all <span class="vent">vents</span> before they escape.</li>
+    </ul>
+
+    <h3>Lose</h3>
+    <ul>
+      <li>If the <span class="saboteur">Saboteur</span> sabotages all <span class="task">tasks</span> and escapes through a <span class="vent">vent</span>.</li>
+    </ul>
+
     <h3>Controls</h3>
-    <p>🖱️ Tap a tile to move.<br>⌨️ Use WASD or arrow keys.</p>
+    <p>🖱️ Click/tap a tile to move.<br>⌨️ Use <strong>W, A, S, D</strong> or arrow keys.</p>
+    
     <button id="start-button">Start</button>
   </div>
 </div>

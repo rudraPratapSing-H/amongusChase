@@ -86,6 +86,7 @@ function generateToken() {
     return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
 }
 
+
 /**
  * Initializes the game state, parses the map to find player/impostor start positions.
  */
@@ -606,13 +607,13 @@ function handleImpostorLanding() {
 
     // If all tasks are sabotaged (red), impostor escapes
     if (allTasks.length === 0 && allRedTasks.length > 0 && isOnVent) {
-        endGame("Impostor Escaped!");
+        endGame("Impostor Escaped, YOU LOST!");
         return;
     }
 
     if (isOnVent) {
         if (allTasks.length === 0) {
-            endGame("Impostor Escaped!");
+            endGame("Impostor Escaped, YOU LOST!");
             return;
         }
         // Impostor disappears for 1.5 seconds before teleporting
@@ -640,7 +641,7 @@ function checkGameEndConditions() {
     if (gameOver || !impostor) return;
     if (player.x === impostor.x && player.y === impostor.y) {
         impostor = null;
-        endGame("You Caught the Impostor!");
+        endGame("You Won!");
         return;
     }
     

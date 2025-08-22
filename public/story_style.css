@@ -199,6 +199,32 @@ body::after {
   box-shadow: 0 2px 12px rgba(0,255,255,0.15);
 }
 
+/* Add to your story_style.css for better mobile appearance */
+#skip-story {
+  background: var(--button-bg, #222);
+  color: var(--primary-text, #fff);
+  border: 1px solid var(--accent-cyan, #00ffff);
+  border-radius: 8px;
+  padding: 8px 18px;
+  font-family: inherit;
+  font-size: 1em;
+  cursor: pointer;
+  opacity: 0.85;
+  transition: opacity 0.2s;
+}
+#skip-story:hover {
+  opacity: 1;
+}
+@media (max-width: 600px) {
+  #skip-story {
+    top: 8px;
+    right: 8px;
+    font-size: 0.95em;
+    padding: 6px 12px;
+    border-radius: 7px;
+  }
+}
+
 /* Responsive adjustments for smaller screens */
 @media (max-width: 900px) {
   .story-container {
