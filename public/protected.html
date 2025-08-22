@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Protected Form</title>
+    <style>
+        /* Background Image - Covers Entire Screen */
+        .bg-image {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: -1; /* Places the image behind everything */
+        }
+
+        /* Fullscreen Layout */
+        body {
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            width: 100vw;
+            font-family: Arial, sans-serif;
+            color: white;
+            text-align: center;
+            position: relative;
+            overflow: hidden; /* Prevents scrolling */
+        }
+
+        /* Large Header */
+        h2 {
+            font-size: 50px; /* Bigger Font */
+            font-weight: bold;
+            text-shadow: 4px 4px 10px rgba(0, 0, 0, 0.6);
+            margin-bottom: 10px;
+        }
+
+        /* Full-Screen Form with Larger Text */
+        #secureForm {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100vw; /* Full Width */
+            height: 100vh; /* Full Height */
+            border: none;
+            background: rgba(255, 255, 255, 0.2); /* Light Transparent */
+            backdrop-filter: blur(12px); /* Glass Effect */
+        }
+
+        /* Adjust Embedded Form's Text Size */
+        #secureForm iframe {
+            transform: scale(1.2); /* Increase form size */
+            transform-origin: center; /* Keep it centered */
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+<body>
+    <!-- Background Image -->
+    <img src="bg.jpg" alt="Background Image" class="bg-image">
+    
+    <h2>Verifying Access...</h2>
+    <iframe id="secureForm"></iframe>
+
+    <script>
+        // For testing: set the token in localStorage if not already set
+        let urlParams = new URLSearchParams(window.location.search);
+        let token = urlParams.get("token");
+        let storedToken = localStorage.getItem("secureFormToken");
+
+        // Uncomment the next line and set your test token value if needed
+        // localStorage.setItem("secureFormToken", "your_test_token");
+
+        if (token && token === storedToken) {
+            document.getElementById("secureForm").src = "https://docs.google.com/forms/d/e/1FAIpQLSeF5yvyqYh6CrKAMW7uFT257aCfXfgVdDUpYn7IMZtEWonoZA/viewform?embedded=true";
+            document.getElementById("secureForm").style.display = "block";
+            document.querySelector("h2").style.display = "none"; /* Hide text when form loads */
+        } else {
+            document.body.innerHTML = "<h2>Access Denied ❌</h2><p style='font-size: 24px;'>This link is invalid or has expired.</p>";
+        }
+    </script>
+</body>
+</html>
