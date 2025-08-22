@@ -763,7 +763,7 @@ function checkGameEndConditions() {
   if (gameOver || !impostor) return;
   if (player.x === impostor.x && player.y === impostor.y) {
     impostor = null;
-    endGame("You Won!");
+    endGame("You caught the impostor! You Won!");
     return;
   }
 }
