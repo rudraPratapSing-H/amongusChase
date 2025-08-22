@@ -31,10 +31,10 @@ const sounds = {
     win: new Audio("sounds/win.mp3"),
     lose: new Audio("sounds/lose.mp3"),
 };
-sounds.move.volume = 0.4;
+sounds.move.volume = 0.6;
 sounds.task.volume = 0.7;
-sounds.seal.volume = 0.8;
-sounds.tap.volume = 0.6;
+sounds.seal.volume = 0.7;
+sounds.tap.volume = 0.5;
 
 // --- Game State ---
 let tasksCompleted = 0;
