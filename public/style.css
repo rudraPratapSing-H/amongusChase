@@ -557,3 +557,58 @@ body.game-active #game-wrapper {
     border-radius: 7px;
   }
 }
+
+#levelSelector {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+#levelMinusButton,
+#levelPlusButton {
+  padding: 10px 22px;
+  font-size: 1.2rem;
+  font-family: var(--font-main);
+  background-color: var(--accent-cyan);
+  color: var(--primary-bg);
+  border: 2px solid var(--accent-green);
+  border-radius: 8px;
+  cursor: pointer;
+  box-shadow: 0 2px 12px rgba(0,255,255,0.15);
+  transition: all 0.2s;
+  font-weight: bold;
+}
+
+#levelMinusButton:hover,
+#levelPlusButton:hover {
+  background-color: var(--accent-green);
+  color: var(--primary-bg);
+  transform: scale(1.08);
+  box-shadow: 0 0 20px var(--accent-green);
+}
+
+#levelDisplay {
+  font-size: 1.2em;
+  font-weight: bold;
+  color: var(--accent-cyan);
+  padding: 0 12px;
+}
+
+@media (max-width: 600px) {
+  #levelSelector {
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+  #levelMinusButton,
+  #levelPlusButton {
+    font-size: 1em;
+    padding: 8px 16px;
+    border-radius: 7px;
+  }
+  #levelDisplay {
+    font-size: 1em;
+    padding: 0 8px;
+  }
+}

@@ -27,13 +27,12 @@
       <li>There are <strong><span class="task">tasks (T)</span></strong> on the map. The <span class="saboteur">Saboteur</span> sabotages them by stepping on them.</li>
       <li>Fix sabotaged <span class="task">tasks</span> by moving over them.</li>
       <li>There are <strong><span class="vent">vents (V)</span></strong>. The <span class="saboteur">Saboteur</span> can teleport between <span class="vent">vents</span> and escape through one if you don’t stop them.</li>
-      <li><strong>Tip:</strong> Move over a <span class="vent">vent</span> to seal it. Once sealed, the <span class="saboteur">Saboteur</span> cannot use that vent, making escape harder.</li>
+      <li><strong>Tip:</strong> Move over a <span class="vent">vent</span> to seal it. Once sealed, the <span class="saboteur">Saboteur</span> cannot use that vent, making escape harder. (You can't seal vents in level 3)</li>
     </ul>
 
     <h3>Win</h3>
     <ul>
       <li>Catch the <span class="saboteur">Saboteur. (Saboteur can dodge you sometimes) </span>.</li>
-      <!-- <li>Or seal/block all <span class="vent">vents</span> before they escape.</li> -->
     </ul>
 
     <h3>Lose</h3>
@@ -44,8 +43,16 @@
     <h3>Controls</h3>
     <p>🖱️ Click/tap a tile to move.</p>
     <p style="text-align:center; font-size:0.95em; color:#00ffff; margin-top:24px; user-select:none;">
-  Made by Rudra Pratap Singh
-</p>
+      Made by Rudra Pratap Singh
+    </p>
+
+    <!-- Level Selector Section -->
+    <div id="levelSelector" style="display:flex; align-items:center; justify-content:center; gap:16px; margin-bottom:18px;">
+      <button id="levelMinusButton" type="button" style="padding:8px 16px;" onclick="levelDown()">-</button>
+      <span id="levelDisplay" style="font-size:1.1em; font-weight:bold;">Level 1</span>
+      <button id="levelPlusButton" type="button" style="padding:8px 16px;" onclick="levelUp()">+</button>
+    </div>
+
     <button id="start-button">Start</button>
   </div>
 </div>
@@ -53,14 +60,13 @@
     <div id="game-content">
         <canvas id="gameCanvas" height="400" width="600"></canvas>
     </div>
-    <div id="overallCnt">
+   <div id="overallCnt">
     <div id="btnCnt">
-    <button id="replay" onclick="window.location.href = 'main_game.html'">🔄 Replay</button>
+    <button id="replay" onclick="window.location.href = 'main_game.html'">🔄 Replay or change level</button>
     </div>
     <div id="btnCnt2">
     <button id="formButton" onclick="window.location.href='https://docs.google.com/forms/d/e/1FAIpQLSeF5yvyqYh6CrKAMW7uFT257aCfXfgVdDUpYn7IMZtEWonoZA/viewform?usp=dialog'">📝 Proceed to Form</button></div>
-    </div>
-</div>
+    </div></div>
 <script src="script.js"></script>
 </body>
 </html>
