@@ -287,31 +287,37 @@ body.game-active #game-wrapper {
     box-shadow: 0 0 20px var(--accent-green);
   }
 
-  #popup-modal {
-          position: fixed;
-          top: 0;
-          left: 0;
-          width: 100vw;
-          height: auto;
-          pointer-events: none; /* Allows interaction with the game below */
-          display: flex;
-          justify-content: center;
-          align-items: flex-start;
-          z-index: 99999;
-        }
+  
+/* Popup Modal Styles */
+#popup-modal {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,0.35);
+  z-index: 99999;
+  backdrop-filter: blur(8px); /* Blurs the background */
+}
 
-        #popup-content {
-          margin-top: 32px;
-          background: var(--button-bg, #222);
-          color: var(--primary-text, #fff);
-          padding: 1em 2em;
-          border-radius: 12px;
-          box-shadow: 0 0 20px #00ffff88;
-          text-align: center;
-          min-width: 220px;
-          pointer-events: auto; /* Allows pointer events on the popup itself if needed */
-        }
+#popup-content {
+  background: var(--button-bg, #222);
+  color: var(--primary-text, #fff);
+  padding: 2em 2.5em;
+  border-radius: 16px;
+  box-shadow: 0 0 24px #00ffff88;
+  text-align: center;
+  min-width: 220px;
+  font-size: 1.15em;
+  pointer-events: auto;
+  animation: pop-in 0.3s;
+}
 
+@keyframes pop-in {
+  from { transform: scale(0.8); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
         /* --- Responsive Improvements for Mobile --- */
 @media (max-width: 900px) {
   #game-wrapper {
