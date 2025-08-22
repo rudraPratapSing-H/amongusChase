@@ -259,6 +259,95 @@ body.game-active #game-wrapper {
   opacity: 0;
   transform: translateX(-50%) translateY(20px);
 }
+#replay {
+  display: none;
+  position: absolute;
+  bottom: 70px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 12px 28px;
+  font-size: 1.1rem;
+  font-family: var(--font-main);
+  background-color: var(--accent-cyan);
+  color: var(--primary-bg);
+  border: none;
+  border-radius: 8px;
+  z-index: 20;
+  cursor: pointer;
+  box-shadow: 0 2px 12px rgba(0,255,255,0.15);
+  transition: all 0.3s;
+  opacity: 0;
+  animation: pop-in 0.5s ease-out forwards;
+}
+
+#replay[style*="display: block"] {
+  opacity: 1;
+}
+
+#replay:hover {
+  background-color: var(--accent-green);
+  color: var(--primary-bg);
+  transform: translateX(-50%) scale(1.08);
+  box-shadow: 0 0 20px var(--accent-green);
+}
+
+@media (max-width: 600px) {
+  #replay {
+    bottom: 50px;
+    font-size: 1em;
+    padding: 8px 16px;
+    border-radius: 7px;
+  }
+}
+#overallCnt {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  margin-bottom: 32px;
+}
+
+#btnCnt {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 32px;
+  margin-bottom: 8px;
+}
+
+#btnCnt2 {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 8px;
+}
+
+/* Responsive for mobile screens */
+@media (max-width: 600px) {
+  #overallCnt {
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 18px;
+    width: 100vw;
+  }
+  #btnCnt {
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 4px;
+    width: 90vw;
+  }
+  #btnCnt2 {
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 4px;
+    width: 90vw;
+  }
+}
 
 /* NEW: This class will be added by JS, but we can style its appearance */
 /* In your JS, when you set display to 'block', also add this class.

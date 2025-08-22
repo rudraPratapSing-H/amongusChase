@@ -20,6 +20,7 @@ const IMPOSTOR_FLEE_DISTANCE = 7; // How close player must be for impostor to fl
 const IMPOSTOR_PATH_AVOID_DISTANCE = 3; // Impostor avoids plotting paths this close to the player
 const IMPOSTOR_VENT_TELEPORT_DELAY = 1500; // 1.5 second gap between teleporting
 const IMPOSTOR_HUNT_CHANCE = 0.7; // 70% chance for the impostor to hunt a task instead of patrolling
+const replayButton = document.getElementById("replay")
 
 // --- Sound Effects ---
 const sounds = {
@@ -136,13 +137,16 @@ function endGame(message) {
     sounds.move.pause(); // Stop any lingering movement sounds
 
     const endButton = document.getElementById("formButton");
-    const isWin = message.includes("Caught") || message.includes("trapped");
+    
+    const isWin = message.includes("Caught") || message.includes("trapped") || message.includes("Won");
 
     if (isWin) {
+        console.log("won");
         sounds.win.play();
+        replayButton.style.display = "block";
         endButton.innerHTML = "📝 Proceed to Form";
-
-        // NEW: Token generation logic
+       
+         
         const winToken = generateToken(); // Create a new token
         localStorage.setItem("secureFormToken", winToken); // Save it to the browser's memory
 
@@ -153,6 +157,7 @@ function endGame(message) {
     };
 
     } else {
+        console.log("lost")
         sounds.lose.play();
         endButton.innerHTML = "🔄 Retry";
         endButton.onclick = () => window.location.reload();
@@ -592,12 +597,12 @@ function handleImpostorLanding() {
     const allVents = findAll("V");
     const isOnVent = allVents.some((v) => v.x === impostor.x && v.y === impostor.y);
     
-    console.log(flag)
+    // console.log(flag)
     // NEW: If half or more tasks are sabotaged, warn the player
     const totalTasks = allTasks.length + allRedTasks.length;
     if (totalTasks > 0 && allRedTasks.length >= Math.ceil(totalTasks / 2) && !flag) {
        
-        console.log(flag)
+        // console.log(flag)
         showPopup("If the Saboteur sabotages all tasks, they will escape through the vents. Undo the sabotaged (red) tasks to prevent their escape.", 4000);
          setTimeout(() => {
             flag = true;
@@ -805,6 +810,7 @@ document.getElementById("start-button").addEventListener("click", () => {
 
 function setupAndStartGame() {
     document.body.classList.add("game-active");
+    replayButton.style.display = "none";
     setup();
     // Show initial popups with improved English
     showPopup("Tap a location to move your character there.", 2200);
