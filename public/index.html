@@ -18,49 +18,48 @@
     <p>Click to Begin Transmission</p>
 </div>
 
-<div class="image-container" id="image-container">
-    <!-- Images will be dynamically added here by JavaScript -->
-</div>
+<!-- FIX: Re-added the main story container div that the CSS relies on -->
+<div class="story-container">
+    <div class="image-container" id="image-container">
+        <!-- Images will be dynamically added here by JavaScript -->
+    </div>
 
-<div class="dialogue-box">
-    <p class="story-text" id="story-text-element"></p>
-    <button id="nav-button">Next</button>
+    <div class="dialogue-box">
+        <p class="story-text" id="story-text-element"></p>
+        <button id="nav-button">Next</button>
+    </div>
 </div>
 
 <script>
     document.addEventListener('DOMContentLoaded', () => {
-        // --- Story Content (Updated with line breaks using '\n') ---
+        // --- Story Content (Updated with corrected image paths) ---
         const scenes = [
             {
-                image: 'Images/Scen_1.jpg',
-                text: ''
-            },
-            {
-                image: 'Images/Scen_1.jpg',
+                image: 'Images/Scen_1.jpg', // FIX: Reverted to 'Images'
                 text: 'In the cold silence of space, a shadow hides among the stars.\nAn alien impostor boards the vessel, disguised as one of the crew.'
             },
             {
-                image: 'Images/Scen_2.jpg',
+                image: 'Images/Scen_2.jpg', // FIX: Reverted to 'Images'
                 text: 'At first, no one suspects. But soon—systems fail, engines sputter, and trust fractures.\nThe impostor strikes without mercy… one by one, the crew falls.'
             },
             {
-                image: 'Images/Scen_3.jpg',
+                image: 'Images/Scen_3.jpg', // FIX: Reverted to 'Images'
                 text: 'When the last breath fades, the impostor claims the ship’s heart—the reactor core.\nWith alarms wailing across empty halls, the predator prepares its escape.'
             },
             {
-                image: 'Images/Scen_4.jpg',
+                image: 'Images/Scen_4.jpg', // FIX: Reverted to 'Images'
                 text: 'Yet… all is not lost.\nDeep within the ship, a stasis pod hisses open.\nA lone crewmate awakens, ready to fight back against the impostor.'
             },
             {
-                image: 'Images/Scen_5.jpg',
+                image: 'Images/Scen_5.jpg', // FIX: Reverted to 'Images'
                 text: 'They find the silence of death…\nthe journal of a fallen friend…\nand the truth of betrayal.'
             },
             {
-                image: 'Images/Scen_6.jpg',
+                image: 'Images/Scen_6.jpg', // FIX: Reverted to 'Images'
                 text: 'Now armed and resolute,\nthe survivor rises with a single mission:'
             },
             {
-                image: 'Images/Scen_7.jpg',
+                image: 'Images/Scen_7.jpg', // FIX: Reverted to 'Images'
                 text: 'Hunt the impostor. Stop its escape.\nAvenge the crew…\nor die as the last casualty.'
             }
         ];
