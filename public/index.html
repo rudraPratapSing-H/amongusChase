@@ -4,68 +4,127 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Vent Chase - The Story</title>
+    <!-- Link to your external stylesheet -->
     <link rel="stylesheet" href="story_style.css">
+    <!-- Linking the required fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&family=Roboto:wght@400&display=swap" rel="stylesheet">
+    <!-- Tone.js for sound effects -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.js"></script>
 </head>
 <body>
 
-<div class="story-container">
-    <div class="image-container" id="image-container">
-        <!-- Images will be dynamically added here by JavaScript -->
-    </div>
-    
-    <div class="dialogue-box">
-        <p class="story-text" id="story-text-element"></p>
-        <button id="nav-button">Next</button>
-    </div>
+<!-- This overlay ensures audio can start on the first user interaction -->
+<div id="start-story-overlay">
+    <p>Click to Begin Transmission</p>
+</div>
+
+<div class="image-container" id="image-container">
+    <!-- Images will be dynamically added here by JavaScript -->
+</div>
+
+<div class="dialogue-box">
+    <p class="story-text" id="story-text-element"></p>
+    <button id="nav-button">Next</button>
 </div>
 
 <script>
     document.addEventListener('DOMContentLoaded', () => {
-        // --- Story Content ---
-        // Each object represents a scene with its image and text.
+        // --- Story Content (Updated with line breaks using '\n') ---
         const scenes = [
             {
                 image: 'Images/Scen_1.jpg',
-                text: 'In the cold silence of space, a shadow hides among the stars. An alien impostor boards the vessel, disguised as one of the crew.'
+                text: ''
+            },
+            {
+                image: 'Images/Scen_1.jpg',
+                text: 'In the cold silence of space, a shadow hides among the stars.\nAn alien impostor boards the vessel, disguised as one of the crew.'
             },
             {
                 image: 'Images/Scen_2.jpg',
-                text: 'At first, no one suspects. But soon—systems fail, engines sputter, and trust fractures. The impostor strikes without mercy… one by one, the crew falls.'
+                text: 'At first, no one suspects. But soon—systems fail, engines sputter, and trust fractures.\nThe impostor strikes without mercy… one by one, the crew falls.'
             },
             {
                 image: 'Images/Scen_3.jpg',
-                text: 'When the last breath fades, the impostor claims the ship’s heart—the reactor core. With alarms wailing across empty halls, the predator prepares its escape.'
+                text: 'When the last breath fades, the impostor claims the ship’s heart—the reactor core.\nWith alarms wailing across empty halls, the predator prepares its escape.'
             },
             {
                 image: 'Images/Scen_4.jpg',
-                text: 'Yet… all is not lost. Deep within the ship, a stasis pod hisses open. A lone crewmate awakens, ready to fight back against the impostor.'
+                text: 'Yet… all is not lost.\nDeep within the ship, a stasis pod hisses open.\nA lone crewmate awakens, ready to fight back against the impostor.'
             },
             {
                 image: 'Images/Scen_5.jpg',
-                text: 'They find the silence of death… the journal of a fallen friend… and the truth of betrayal.'
+                text: 'They find the silence of death…\nthe journal of a fallen friend…\nand the truth of betrayal.'
             },
             {
                 image: 'Images/Scen_6.jpg',
-                text: 'Now armed and resolute,the survivor rises with a single mission:'
+                text: 'Now armed and resolute,\nthe survivor rises with a single mission:'
             },
             {
                 image: 'Images/Scen_7.jpg',
-                text: 'Hunt the impostor. Stop its escape. Avenge the crew… or die as the last casualty.'
+                text: 'Hunt the impostor. Stop its escape.\nAvenge the crew…\nor die as the last casualty.'
             }
         ];
 
         // --- DOM Elements ---
+        const startOverlay = document.getElementById('start-story-overlay');
         const imageContainer = document.getElementById('image-container');
         const storyTextElement = document.getElementById('story-text-element');
         const navButton = document.getElementById('nav-button');
 
+        // --- State ---
         let currentSceneIndex = 0;
+        let isTyping = false;
+        let audioStarted = false;
+        let typingTimeout = null; // Use a timeout for recursive typing
 
-        // --- Functions ---
+        // --- Sound Synthesis (Updated for a softer sound) ---
+        const typewriterSound = new Tone.Synth({
+            oscillator: { type: 'triangle' }, // Softer sound wave
+            envelope: { attack: 0.005, decay: 0.05, sustain: 0, release: 0.1 },
+            volume: -25 // Quieter volume
+        }).toDestination();
 
         /**
-         * Pre-loads all scene images into the DOM and sets them to be hidden.
+         * Types out text, handling line breaks and pauses.
+         */
+        function typeText(element, text, onComplete) {
+            if (typingTimeout) clearTimeout(typingTimeout);
+
+            isTyping = true;
+            navButton.style.visibility = 'hidden'; // Hide button during typing
+            element.innerHTML = ''; // Use innerHTML to render <br> tags
+            element.classList.remove('typing-done');
+            let i = 0;
+
+            const type = () => {
+                if (i < text.length) {
+                    const char = text.charAt(i);
+                    if (char === '\n') {
+                        element.innerHTML += '<br>';
+                        // Pause for a moment after a line break
+                        typingTimeout = setTimeout(type, 400); 
+                    } else {
+                        element.innerHTML += char;
+                        if (audioStarted) {
+                            // Lower, randomized pitch for a more pleasant effect
+                            typewriterSound.triggerAttackRelease(400 + Math.random() * 100, '32n');
+                        }
+                        // Continue typing normally
+                        typingTimeout = setTimeout(type, 40);
+                    }
+                    i++;
+                } else {
+                    isTyping = false;
+                    navButton.style.visibility = 'visible'; // Show button when done
+                    element.classList.add('typing-done');
+                    if (onComplete) onComplete();
+                }
+            };
+            type(); // Start the recursive typing function
+        }
+        
+        /**
+         * Pre-loads all scene images into the DOM.
          */
         function initializeImages() {
             scenes.forEach((scene, index) => {
@@ -73,9 +132,8 @@
                 img.src = scene.image;
                 img.alt = `Scene ${index + 1}`;
                 img.classList.add('scene-image');
-                // Add a fallback in case an image fails to load
                 img.onerror = () => {
-                    img.src = `https://placehold.co/800x600/0d0d1a/00ffff?text=Scene+${index+1}+Not+Found`;
+                    img.src = `https://placehold.co/1920x1080/0d0d1a/00ffff?text=Scene+${index+1}+Not+Found`;
                 };
                 imageContainer.appendChild(img);
             });
@@ -83,23 +141,15 @@
 
         /**
          * Displays a specific scene by its index.
-         * @param {number} index - The index of the scene to show.
          */
         function showScene(index) {
-            // Update image visibility
             const allImages = document.querySelectorAll('.scene-image');
             allImages.forEach((img, imgIndex) => {
-                if (imgIndex === index) {
-                    img.classList.add('active');
-                } else {
-                    img.classList.remove('active');
-                }
+                img.classList.toggle('active', imgIndex === index);
             });
 
-            // Update text
-            storyTextElement.textContent = scenes[index].text;
+            typeText(storyTextElement, scenes[index].text);
 
-            // Update button
             if (index === scenes.length - 1) {
                 navButton.textContent = 'Begin Mission';
             } else {
@@ -108,22 +158,40 @@
         }
 
         // --- Event Listeners ---
+        startOverlay.addEventListener('click', async () => {
+            // This is the crucial first interaction to enable audio
+            if (!audioStarted) {
+                await Tone.start();
+                audioStarted = true;
+                console.log('Audio context started');
+            }
+            startOverlay.style.display = 'none'; // Hide overlay
+            showScene(0); // Show the first scene, now with sound ready
+        }, { once: true });
 
-        navButton.addEventListener('click', () => {
+        // **FIX:** Added the audio start logic here as a fallback.
+        navButton.addEventListener('click', async () => {
+            if (isTyping) return;
+
+            // This ensures that if the overlay fails for any reason,
+            // the first click on "Next" will still start the audio.
+            if (!audioStarted) {
+                await Tone.start();
+                audioStarted = true;
+                console.log('Audio context started');
+            }
+
             if (currentSceneIndex < scenes.length - 1) {
-                // If not the last scene, advance to the next one
                 currentSceneIndex++;
                 showScene(currentSceneIndex);
             } else {
-                // If on the last scene, clicking "Begin Mission" goes to the game
-                // *** THIS LINE HAS BEEN UPDATED ***
                 window.location.href = 'main_game.html?from=story';
             }
         });
 
         // --- Initial Setup ---
         initializeImages();
-        showScene(0); // Show the first scene on page load
+        // The story now waits for the user to click the overlay before starting.
     });
 </script>
 
