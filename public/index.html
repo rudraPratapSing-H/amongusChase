@@ -24,7 +24,7 @@
         <!-- Images will be dynamically added here by JavaScript -->
     </div>
 
-    <div class="dialogue-box">
+    <div class="dialogue-box" id="dialogue-box">
         <p class="story-text" id="story-text-element"></p>
         <button id="nav-button">Next</button>
     </div>
@@ -67,6 +67,7 @@
         // --- DOM Elements ---
         const startOverlay = document.getElementById('start-story-overlay');
         const imageContainer = document.getElementById('image-container');
+        const dialogueBox = document.getElementById('dialogue-box'); // Added dialogue box
         const storyTextElement = document.getElementById('story-text-element');
         const navButton = document.getElementById('nav-button');
 
@@ -168,12 +169,9 @@
             showScene(0); // Show the first scene, now with sound ready
         }, { once: true });
 
-        // **FIX:** Added the audio start logic here as a fallback.
         navButton.addEventListener('click', async () => {
             if (isTyping) return;
 
-            // This ensures that if the overlay fails for any reason,
-            // the first click on "Next" will still start the audio.
             if (!audioStarted) {
                 await Tone.start();
                 audioStarted = true;
@@ -185,6 +183,31 @@
                 showScene(currentSceneIndex);
             } else {
                 window.location.href = 'main_game.html?from=story';
+            }
+        });
+
+        // --- Event listener to skip typing animation ---
+        dialogueBox.addEventListener('click', (event) => {
+            // If the click was on the button itself, do nothing.
+            // This allows the button's own click listener to handle the event.
+            if (event.target === navButton) {
+                return;
+            }
+
+            if (isTyping) {
+                // Stop the current animation timer
+                clearTimeout(typingTimeout);
+                
+                // Get the full text for the current scene
+                const fullText = scenes[currentSceneIndex].text;
+                
+                // Instantly display the full text, converting newlines to <br>
+                storyTextElement.innerHTML = fullText.replace(/\n/g, '<br>');
+                
+                // Update all state flags to reflect that typing is done
+                isTyping = false;
+                navButton.style.visibility = 'visible';
+                storyTextElement.classList.add('typing-done');
             }
         });
 
