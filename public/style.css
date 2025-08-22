@@ -385,53 +385,54 @@ body.game-active #game-wrapper {
     width: 100vw;
   }
   #game-flex {
-    gap: 6px;
+    gap: 4px;
     width: 100vw;
     height: 100dvh;
   }
   #game-content {
-    padding: 2px;
+    padding: 0;
     width: 100vw;
-    min-height: 30vh;
+    min-height: 60vh;
   }
   #gameCanvas {
-    margin-top: 8px;
-    max-width: 99vw;
-    max-height: 35vh;
+    margin-top: 4px;
+    max-width: 100vw;
+    max-height: 80vh;
     border-radius: 8px;
     font-size: 0.85em;
   }
   #info-header {
-    font-size: 0.95em;
-    padding: 3px 4px;
-    margin-bottom: 4px;
+    font-size: 0.8em;
+    padding: 2px 3px;
+    margin-bottom: 2px;
     flex-direction: column;
     align-items: center;
-    width: 99vw;
-    border-radius: 8px;
+    width: 98vw;
+    border-radius: 7px;
   }
   #hud {
-    font-size: 0.95em;
-    margin-top: 2px;
+    font-size: 0.8em;
+    margin-top: 1px;
   }
   #formButton {
-    font-size: 0.95em;
-    padding: 8px 12px;
-    bottom: 6px;
+    font-size: 0.85em;
+    padding: 6px 10px;
+    bottom: 4px;
   }
   #popup-content {
-    margin-top: 8px;
-    min-width: 120px;
-    font-size: 0.9em;
-    padding: 0.5em 0.7em;
+    margin-top: 4px;
+    min-width: 90px;
+    font-size: 0.8em;
+    padding: 0.4em 0.5em;
+    border-radius: 10px;
   }
   #start-overlay {
-    padding: 4px;
+    padding: 2px;
   }
   #rules-container {
-    padding: 6px;
-    max-width: 99vw;
-    font-size: 0.95em;
-    border-radius: 8px;
+    padding: 4px;
+    max-width: 98vw;
+    font-size: 0.85em;
+    border-radius: 7px;
   }
 }
