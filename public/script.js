@@ -719,30 +719,48 @@ function handleImpostorLanding() {
     const row = tileMap[impostor.y].split("");
     row[impostor.x] = "R";
     tileMap[impostor.y] = row.join("");
-    // Show popup only on first sabotage
     if (!window._impostorFirstSabotage) {
-      // showPopup("Restore green tasks that have been sabotaged and turned red.", 2500);
       window._impostorFirstSabotage = true;
     }
   }
-  // If impostor lands on a red task, do nothing
 
+  // --- MOVE THESE UP ---
   const allTasks = findAll("T");
   const allRedTasks = findAll("R");
   const allVents = findAll("V");
   const isOnVent = allVents.some(
     (v) => v.x === impostor.x && v.y === impostor.y
   );
+  // ---------------------
 
-  // console.log(flag)
-  // NEW: If half or more tasks are sabotaged, warn the player
+  // VENT TELEPORT LOGIC
+  if (isOnVent && !gameOver) {
+    // Find all vents except the current one
+    const otherVents = allVents.filter(v => v.x !== impostor.x || v.y !== impostor.y);
+    if (otherVents.length > 0) {
+      // Randomly pick another vent to teleport to
+      const targetVent = otherVents[Math.floor(Math.random() * otherVents.length)];
+      impostor.isHidden = true;
+      drawGrid();
+      setTimeout(() => {
+        impostor.x = targetVent.x;
+        impostor.y = targetVent.y;
+        impostor.screenX = targetVent.x * tileSize;
+        impostor.screenY = targetVent.y * tileSize;
+        impostor.isHidden = false;
+        drawGrid();
+        checkGameEndConditions();
+      }, IMPOSTOR_VENT_TELEPORT_DELAY);
+    }
+  }
+
+  // If half or more tasks are sabotaged, warn the player
   const totalTasks = allTasks.length + allRedTasks.length;
   if (
     totalTasks > 0 &&
     allRedTasks.length >= Math.ceil(totalTasks / 2) &&
     !flag
   ) {
-    // console.log(flag)
     showPopup(
       "If the Saboteur sabotages all tasks, they will escape through the vents. Undo the sabotaged (red) tasks to prevent their escape.",
       4000
@@ -958,7 +976,7 @@ startButton.addEventListener(
       }
       setupAndStartGame();
     } catch (err) {
-      console.error("Could not activate landscape/fullscreen mode:", err);
+      console.log("Could not activate landscape/fullscreen mode:", err);
       
       setupAndStartGame();
     }
