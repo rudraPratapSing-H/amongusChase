@@ -158,3 +158,29 @@ body::after {
     70% { transform: scale(1.02); box-shadow: 0 0 15px 10px rgba(0, 255, 0, 0); }
     100% { transform: scale(1); box-shadow: 0 0 5px 0 rgba(0, 255, 0, 0); }
 }
+
+/* Move the form button to the top of the screen and center it */
+#formButton {
+  position: fixed;
+  top: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  margin-top: 0;
+  margin-bottom: 0;
+  opacity: 1;
+  font-size: 1.1em;
+  padding: 12px 28px;
+  border-radius: 8px;
+  box-shadow: 0 2px 12px rgba(0,255,255,0.15);
+}
+
+/* Responsive adjustment for mobile */
+@media (max-width: 600px) {
+  #formButton {
+    top: 8px;
+    font-size: 1em;
+    padding: 8px 16px;
+    border-radius: 7px;
+  }
+}

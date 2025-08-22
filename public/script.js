@@ -23,6 +23,7 @@ const IMPOSTOR_HUNT_CHANCE = 0.7; // 70% chance for the impostor to hunt a task 
 
 // --- Sound Effects ---
 const sounds = {
+    tap: new Audio("sounds/tap.mp3"),
     move: new Audio("sounds/move.mp3"),
     task: new Audio("sounds/task.mp3"),
     seal: new Audio("sounds/seal.mp3"),
@@ -32,6 +33,7 @@ const sounds = {
 sounds.move.volume = 0.4;
 sounds.task.volume = 0.7;
 sounds.seal.volume = 0.8;
+sounds.tap.volume = 0.6;
 
 // --- Game State ---
 let tasksCompleted = 0;
@@ -266,7 +268,7 @@ function drawGrid() {
     }
 
     // Draw Player
-    ctx.fillStyle = "blue";
+    ctx.fillStyle = "yellow";
     ctx.beginPath();
     ctx.arc(player.screenX + tileSize / 2, player.screenY + tileSize / 2, tileSize / 2 - 2, 0, Math.PI * 2);
     ctx.fill();
@@ -274,7 +276,7 @@ function drawGrid() {
     ctx.fillStyle = "#fff";
     ctx.font = `bold ${tileSize * 0.35}px sans-serif`;
     ctx.textAlign = "center";
-    ctx.fillText("You", player.screenX + tileSize / 2, player.screenY + tileSize - 6);
+    // ctx.fillText("You", player.screenX + tileSize / 2, player.screenY + tileSize - 6);
 
     // Draw Saboteur (Impostor)
     if (impostor && !impostor.isHidden) {
@@ -286,7 +288,7 @@ function drawGrid() {
         ctx.fillStyle = "#fff";
         ctx.font = `bold ${tileSize * 0.35}px sans-serif`;
         ctx.textAlign = "center";
-        ctx.fillText("Saboteur", impostor.screenX + tileSize / 2, impostor.screenY + tileSize - 6);
+        // ctx.fillText("Saboteur", impostor.screenX + tileSize / 2, impostor.screenY + tileSize - 6);
     }
 }
 
@@ -709,7 +711,8 @@ function handleCanvasInteraction(event) {
 
     const rect = canvas.getBoundingClientRect();
     let clientX, clientY;
-
+    sounds.tap.currentTime = 0;
+    sounds.tap.play();
     if (event.touches) {
         clientX = event.touches[0].clientX;
         clientY = event.touches[0].clientY;
