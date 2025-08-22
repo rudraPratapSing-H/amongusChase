@@ -228,6 +228,33 @@ function resizeCanvas() {
     }
 }
 
+function forceFullscreenPrompt() {
+    const modal = document.getElementById("popup-modal");
+    document.getElementById("popup-message").textContent = "For the best experience, tap to enter fullscreen mode.";
+    modal.style.display = "flex";
+    window.popupActive = true;
+    document.body.classList.add("popup-active");
+
+    function requestFullScreenAndResume() {
+        modal.style.display = "none";
+        document.removeEventListener("mousedown", requestFullScreenAndResume);
+        document.removeEventListener("touchstart", requestFullScreenAndResume);
+        window.popupActive = false;
+        document.body.classList.remove("popup-active");
+        if (document.documentElement.requestFullscreen) {
+            document.documentElement.requestFullscreen();
+        }
+        // Optionally, lock orientation to landscape
+        if (screen.orientation && screen.orientation.lock) {
+            screen.orientation.lock("landscape").catch(() => {});
+        }
+    }
+
+    document.addEventListener("mousedown", requestFullScreenAndResume);
+    document.addEventListener("touchstart", requestFullScreenAndResume);
+
+}
+
 /**
  * Updates the HUD timer every second.
  */
@@ -789,6 +816,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
+document.getElementById("start-button").addEventListener("click", () => {
+  forceFullscreenPrompt();
+});
+
 // ================================================================================= //
 //                                 GAME START                                        //
 // ================================================================================= //
@@ -828,7 +859,7 @@ startButton.addEventListener(
 
 // pop up modal
 let gamePlayedOnce = localStorage.getItem("oncePlayed");
-function showPopup(message, duration = 250) {
+function showPopup(message, duration = 500) {
     if (gamePlayedOnce === "true") return;
     document.getElementById("popup-message").textContent = message;
     const modal = document.getElementById("popup-modal");
@@ -837,16 +868,14 @@ function showPopup(message, duration = 250) {
     document.body.classList.add("popup-active");
 
     if (!gameOver && window.popupActive) {
-        IMPOSTOR_MOVE_DURATION = 90000;
-        IMPOSTOR_FLEE_ANIMATION_DURATION = 65000;
+        
         clearInterval(impostorMoveInterval); // Stop impostor movement
     }
 
     setTimeout(() => {
         window.popupActive = false;
         document.body.classList.remove("popup-active");
-        IMPOSTOR_MOVE_DURATION = 90;
-        IMPOSTOR_FLEE_ANIMATION_DURATION = 65;
+        I
         // Restart impostor movement
         if (!gameOver) {
             clearInterval(impostorMoveInterval);

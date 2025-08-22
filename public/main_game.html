@@ -6,82 +6,40 @@
     <title>Vent Chase</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&family=Roboto:wght@400&display=swap" rel="stylesheet">
-
 </head>
+<body>
 <div id="popup-modal" style="display:none;">
   <div id="popup-content">
     <span id="popup-message"></span>
     <p>Tap anywhere to continue</p>
   </div>
 </div>
-<body>
-<div id="popup-modal" style="display:none;">
-  <div id="popup-content">
-    <span id="popup-message"></span>
-  </div>
-</div>
 <div id="start-overlay">
   <div id="rules-container">
-    <h1>// SYSTEM ALERT //</h1>
-    <h2>Mission Briefing: Vent Chase</h2>
+    <h1>Vent Chase</h1>
     <p>
-      You are the last <strong>Crewmate (🔵)</strong> on high alert. A rogue <strong>Saboteur (🔴)</strong> is compromising the station. Your mission is to neutralize the threat before it escapes and dooms us all.
+      <strong>You</strong> (🔵) must stop the <strong>Saboteur</strong> (🔴) from escaping!
     </p>
-
-    <hr>
-
-    <h3>Your Directives:</h3>
     <ul>
-      <li><strong>Reboot Systems (T):</strong> Move over the green terminals ('T') to restore critical functions.</li>
-      <li><strong>Seal Vents (V):</strong> Lock down the cyan maintenance vents ('V') to cut off the Saboteur's escape routes.</li>
+      <li>Move over <strong>green tasks (T)</strong> to keep systems online.</li>
+      <li>Fix <strong>red tasks</strong> sabotaged by the Saboteur.</li>
+      <li>Seal <strong>cyan vents (V)</strong> to block escape routes.</li>
     </ul>
-
-    <h3>Threat Analysis: The Saboteur</h3>
-    <ul>
-      <li>It will actively <strong>sabotage</strong> your progress by taking repaired systems offline.</li>
-      <li>It uses the vent network to <strong>teleport</strong> instantly across the station.</li>
-      <li>It is evasive and will flee to a vent if you get too close.</li>
-    </ul>
-
-    <hr>
-
-    <h2>Mission Success Conditions 🏆</h2>
-    <p>There are two paths to victory. If one fails, attempt the other.</p>
-    
-    <h4>1. Direct Apprehension</h4>
-    <p>Corner the Saboteur and move onto its tile to capture it. This is difficult, as it's programmed to evade you.</p>
-
-    <h4>2. Strategic Containment</h4>
     <p>
-      If you can't catch it, <strong>TRAP IT</strong>. This is the key. By sealing the vents, you limit its mobility. If you <strong>reboot all systems AND seal all vents</strong>, you'll leave it with nowhere to run.
+      <strong>Win:</strong> Catch the Saboteur or seal all vents.<br>
+      <strong>Lose:</strong> If all tasks are sabotaged and the Saboteur escapes.
     </p>
-
-    <h3>Mission Failure ☠️</h3>
-    <p>If you reboot all systems but the Saboteur escapes through an <strong>unsealed vent</strong>, the mission is lost.</p>
-    
-    <div class="controls-section">
-        <h3>Field Controls</h3>
-        <p><strong>🖱️ Tap / Click:</strong> Point to any open tile for auto-pathing.</p>
-        <p><strong>⌨️ Keyboard (WASD / Arrows):</strong> For precise, manual navigation.</p>
-    </div>
-
-    <p class="form-notice"><strong>Note:</strong> You must win the game to unlock the Debriefing <b>Form</b>.</p>
-
-    <button id="start-button">Engage</button>
+    <h3>Controls</h3>
+    <p>🖱️ Tap a tile to move.<br>⌨️ Use WASD or arrow keys.</p>
+    <button id="start-button">Start</button>
   </div>
 </div>
-
 <div id="game-wrapper">
     <div id="game-content">
         <canvas id="gameCanvas" height="400" width="600"></canvas>
     </div>
-    
-    
-    
     <button id="formButton" onclick="window.location.href='https://docs.google.com/forms/d/e/1FAIpQLSeF5yvyqYh6CrKAMW7uFT257aCfXfgVdDUpYn7IMZtEWonoZA/viewform?usp=dialog'">📝 Proceed to Form</button>
 </div>
-
 <script src="script.js"></script>
-
 </body>
 </html>
