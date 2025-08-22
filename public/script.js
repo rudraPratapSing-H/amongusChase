@@ -12,7 +12,7 @@ let flag = false;
 
 // --- Core Game Configuration ---
 // NOTE: These values make the impostor very fast for a high-difficulty experience.
-const PLAYER_MOVE_DURATION = 110; // Player animation speed (lower is faster)
+const PLAYER_MOVE_DURATION = 90; // Player animation speed (lower is faster)
 let IMPOSTOR_MOVE_DURATION =90; // Base impostor animation speed
 let IMPOSTOR_FLEE_ANIMATION_DURATION = 65; // Faster animation when fleeing
 const IMPOSTOR_MOVE_INTERVAL = 200; // ms between impostor moves
@@ -139,6 +139,7 @@ function startTimers() {
  */
 function endGame(message) {
     if (gameOver) return;
+    localStorage.setItem("oncePlayed", "true");
     gameOver = true;
     playerTargetTile = null; // Stop any automated movement
     clearInterval(timerInterval);
@@ -810,47 +811,39 @@ startButton.addEventListener(
 );
 
 // pop up modal
-
-function showPopup(message) {
+let gamePlayedOnce = localStorage.getItem("oncePlayed");
+function showPopup(message, duration = 500) {
+    if (gamePlayedOnce === "true") return;
     document.getElementById("popup-message").textContent = message;
     const modal = document.getElementById("popup-modal");
     modal.style.display = "flex";
-
-    // Pause game timers and movement
-    let wasPaused = false;
-    if (!gameOver) {
-        clearInterval(timerInterval);
-        clearInterval(impostorMoveInterval);
-        IMPOSTOR_MOVE_DURATION = 9000000; // Base impostor animation speed
-        IMPOSTOR_FLEE_ANIMATION_DURATION = 9000000;
-        wasPaused = true;
-       window.disableClick = true;
-    }
-    setTimeout(() => {
-        if (!gameOver && wasPaused) {
-            window.disableClick = false;
-        }
-    }, 1500);
-
-    // Block player movement and input while popup is visible
     window.popupActive = true;
+    document.body.classList.add("popup-active");
 
-    // Wait for user to click/tap anywhere to dismiss popup and resume game
-    function resumeGame() {
-        modal.style.display = "none";
-        document.removeEventListener("mousedown", resumeGame);
-        document.removeEventListener("touchstart", resumeGame);
-        IMPOSTOR_MOVE_DURATION = 90; // Base impostor animation speed
-        IMPOSTOR_FLEE_ANIMATION_DURATION = 65;
+    if (!gameOver && window.popupActive) {
+        IMPOSTOR_MOVE_DURATION = 90000;
+        IMPOSTOR_FLEE_ANIMATION_DURATION = 65000;
+        clearInterval(impostorMoveInterval); // Stop impostor movement
+    }
+
+    setTimeout(() => {
         window.popupActive = false;
-
-        // Resume timers and movement
-        if (wasPaused && !gameOver) {
-            timerInterval = setInterval(updateTimer, 1000);
+        document.body.classList.remove("popup-active");
+        IMPOSTOR_MOVE_DURATION = 90;
+        IMPOSTOR_FLEE_ANIMATION_DURATION = 65;
+        // Restart impostor movement
+        if (!gameOver) {
+            clearInterval(impostorMoveInterval);
             impostorMoveInterval = setInterval(moveImpostorAI, IMPOSTOR_MOVE_INTERVAL);
         }
-    }
 
-    document.addEventListener("mousedown", resumeGame);
-    document.addEventListener("dblclick", resumeGame);
+        function resumeGame() {
+            modal.style.display = "none";
+            document.removeEventListener("mousedown", resumeGame);
+            document.removeEventListener("touchstart", resumeGame);
+        }
+        document.addEventListener("mousedown", resumeGame);
+        document.addEventListener("touchstart", resumeGame);
+    }, duration);
 }
+
