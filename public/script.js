@@ -828,7 +828,7 @@ startButton.addEventListener(
 
 // pop up modal
 let gamePlayedOnce = localStorage.getItem("oncePlayed");
-function showPopup(message, duration = 500) {
+function showPopup(message, duration = 250) {
     if (gamePlayedOnce === "true") return;
     document.getElementById("popup-message").textContent = message;
     const modal = document.getElementById("popup-modal");

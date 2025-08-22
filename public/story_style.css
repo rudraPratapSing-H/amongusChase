@@ -105,6 +105,8 @@ body::after {
 
 /* --- Dialogue Box --- */
 .dialogue-box {
+    display: flex;
+    flex-direction: column;
     width: 100%;
     max-width: 900px;
     min-height: 120px;
@@ -197,12 +199,66 @@ body::after {
   box-shadow: 0 2px 12px rgba(0,255,255,0.15);
 }
 
-/* Responsive adjustment for mobile */
+/* Responsive adjustments for smaller screens */
+@media (max-width: 900px) {
+  .story-container {
+    padding: 10px;
+    min-width: 0;
+  }
+  .image-container {
+    max-width: 98vw;
+    margin-bottom: 12px;
+  }
+  .dialogue-box {
+    max-width: 98vw;
+    min-height: 80px;
+    padding: clamp(10px, 2vw, 18px);
+    border-radius: 12px;
+  }
+  .story-text {
+    font-size: clamp(0.95rem, 2vw, 1.05rem);
+    margin-right: 10px;
+  }
+  #nav-button {
+    font-size: 1rem;
+    padding: 8px 18px;
+    border-radius: 8px;
+  }
+}
+
 @media (max-width: 600px) {
-  #formButton {
-    top: 8px;
-    font-size: 1em;
-    padding: 8px 16px;
+  .story-container {
+    padding: 4px;
+  }
+  .image-container {
+    max-width: 99vw;
+    margin-bottom: 6px;
+  }
+  .scene-image {
     border-radius: 7px;
+    border-width: 1px;
+    box-shadow: 0 0 10px rgba(0, 255, 255, 0.2), 0 0 15px rgba(255, 0, 255, 0.1);
+  }
+  .dialogue-box {
+    max-width: 99vw;
+    min-height: 50px;
+    padding: clamp(6px, 1vw, 12px);
+    border-radius: 7px;
+    font-size: 0.9em;
+  }
+  .story-text {
+    font-size: clamp(0.85rem, 2vw, 0.95rem);
+    margin-right: 6px;
+  }
+  #nav-button {
+    font-size: 0.9rem;
+    padding: 6px 12px;
+    border-radius: 7px;
+  }
+  #formButton {
+    top: 4px;
+    font-size: 0.95em;
+    padding: 6px 10px;
+    border-radius: 6px;
   }
 }
