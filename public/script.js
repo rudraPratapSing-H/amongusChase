@@ -198,10 +198,10 @@ function endGame(message) {
  * Also recalculates tileSize and character screen positions.
  */
 function resizeCanvas() {
+    // Use the full available window size for the canvas
     const aspectRatio = 25 / 15;
-    // UPDATED: Changed from 0.64 to 0.95 to use more screen space.
-    const maxWidth = window.innerWidth * 0.95;
-    const maxHeight = window.innerHeight * 0.95;
+    const maxWidth = window.innerWidth;
+    const maxHeight = window.innerHeight;
 
     let width = maxWidth;
     let height = width / aspectRatio;
@@ -410,7 +410,7 @@ function checkPlayerInteraction() {
         sounds.task.play();
     } else if (tile === "V") {
         ventsSealed++;
-        document.getElementById("ventsCounter").textContent = `Vents Sealed: ${ventsSealed}`;
+        // document.getElementById("ventsCounter").textContent = `Vents Sealed: ${ventsSealed}`;
         sounds.seal.play();
         // Remove the vent from the map
         const row = tileMap[player.y].split("");
