@@ -172,7 +172,6 @@ body::after {
     transform: scale(1.05);
     box-shadow: 0 0 25px var(--accent-green);
     text-shadow: none;
-<<<<<<< HEAD
     animation: none;
 }
 
@@ -207,6 +206,3 @@ body::after {
     border-radius: 7px;
   }
 }
-=======
-}
->>>>>>> 4195f1e8ae49a5a949fb32edd1679ada6bb8ce3b
