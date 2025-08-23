@@ -184,7 +184,7 @@ function endGame(message) {
     status = "false";
   }
   // Now check with updated values
-  if (count > 3 && status === "false") {
+  if (count > 3 && localStorage.getItem("won")  === "false") {
     console.log("more than three turns");
     const modal = document.getElementById("popup-modal");
     document.getElementById("popup-message").textContent =
@@ -746,17 +746,18 @@ function handleImpostorLanding() {
     }
   }
 
-  // --- MOVE THESE UP ---
   const allTasks = findAll("T");
   const allRedTasks = findAll("R");
   const allVents = findAll("V");
   const isOnVent = allVents.some(
     (v) => v.x === impostor.x && v.y === impostor.y
   );
-  // ---------------------
 
-  // VENT TELEPORT LOGIC
-  if (isOnVent && !gameOver) {
+  // Only teleport if impostor is fleeing
+  const distToPlayer = distance(impostor, player);
+  const isFleeing = distToPlayer <= IMPOSTOR_FLEE_DISTANCE || allTasks.length === 0;
+
+  if (isOnVent && !gameOver && isFleeing) {
     // Find all vents except the current one
     const otherVents = allVents.filter(v => v.x !== impostor.x || v.y !== impostor.y);
     if (otherVents.length > 0) {
@@ -776,14 +777,13 @@ function handleImpostorLanding() {
     }
   }
 
-
-
   // If all tasks are sabotaged (red), impostor escapes
   if (allTasks.length === 0 && allRedTasks.length > 0 && isOnVent) {
     endGame("Impostor Escaped, YOU LOST!");
     return;
   }
 }
+
 
 function checkGameEndConditions() {
   if (gameOver || !impostor) return;
