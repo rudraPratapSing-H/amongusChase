@@ -34,7 +34,7 @@ let IMPOSTOR_FLEE_ANIMATION_DURATION = fleeDuration[level - 1]; // Faster animat
 const IMPOSTOR_MOVE_INTERVAL = 200; // ms between impostor moves
 const IMPOSTOR_FLEE_DISTANCE = 7; // How close player must be for impostor to flee
 const IMPOSTOR_PATH_AVOID_DISTANCE = 3; // Impostor avoids plotting paths this close to the player
-const IMPOSTOR_VENT_TELEPORT_DELAY = 1500; // 1.5 second gap between teleporting
+const IMPOSTOR_VENT_TELEPORT_DELAY = time[level - 1]; // 1.5 second gap between teleporting
 const IMPOSTOR_HUNT_CHANCE = 0.7; // 70% chance for the impostor to hunt a task instead of patrolling
 const replayButton = document.getElementById("replay");
 const levelup = document.getElementById("levelPlusButton");
@@ -152,21 +152,38 @@ function setup() {
  * @param {string} message - The win or loss message to display.
  */
 function endGame(message) {
+
   if (gameOver) return;
+  let count = parseInt(localStorage.getItem("count"), 10);
+    const isWin =
+    message.includes("Caught") ||
+    message.includes("trapped") ||
+    message.includes("Won") ||
+    message.includes("escaped") ||
+    message.includes("Sealed") ;
+    const islost =
+    message.includes("LOST") ||
+    count > 3;
+ 
 
   localStorage.setItem("oncePlayed", "true");
   gameOver = true;
-  let c = parseInt(localStorage.getItem("count"), 10);
-  c++;
-  localStorage.setItem("count", c);
   playerTargetTile = null; // Stop any automated movement
   clearInterval(timerInterval);
   clearInterval(impostorMoveInterval);
   sounds.move.pause(); // Stop any lingering movement sounds
 
   const endButton = document.getElementById("formButton");
-  let count = parseInt(localStorage.getItem("count"), 10);
+  // Update status and count before checking for popup
+  
   let status = localStorage.getItem("won");
+  if (islost) {
+    localStorage.setItem("won", "false");
+    count++;
+    localStorage.setItem("count", count);
+    status = "false";
+  }
+  // Now check with updated values
   if (count > 3 && status === "false") {
     console.log("more than three turns");
     const modal = document.getElementById("popup-modal");
@@ -185,23 +202,11 @@ function endGame(message) {
     }
     document.addEventListener("mousedown", resumeGame);
     document.addEventListener("touchstart", resumeGame);
-}
-
-
-  const isWin =
-    message.includes("Caught") ||
-    message.includes("trapped") ||
-    message.includes("Won") ||
-    message.includes("escaped") ||
-    message.includes("Sealed") ;
-    const islost =
-    message.includes("LOST") ||
-    count > 3;
- 
-  if(islost){
-    localStorage.setItem("won", "false");
-
   }
+
+
+
+
 
 
   if (isWin) {
@@ -566,6 +571,7 @@ function levelUp() {
   console.log("Current Level:", level);
   localStorage.setItem("level", level);
   document.getElementById("levelDisplay").innerText = `Level ${level}`;
+  window.location.reload();
 }
 
 function levelDown() {
@@ -576,6 +582,7 @@ function levelDown() {
   console.log("Current Level:", level);
   localStorage.setItem("level", level);
   document.getElementById("levelDisplay").innerText = `Level ${level}`;
+  window.location.reload();
 }
 
 function moveImpostorAI() {
@@ -754,21 +761,7 @@ function handleImpostorLanding() {
     }
   }
 
-  // If half or more tasks are sabotaged, warn the player
-  const totalTasks = allTasks.length + allRedTasks.length;
-  if (
-    totalTasks > 0 &&
-    allRedTasks.length >= Math.ceil(totalTasks / 2) &&
-    !flag
-  ) {
-    showPopup(
-      "If the Saboteur sabotages all tasks, they will escape through the vents. Undo the sabotaged (red) tasks to prevent their escape.",
-      4000
-    );
-    setTimeout(() => {
-      flag = true;
-    }, 4000);
-  }
+
 
   // If all tasks are sabotaged (red), impostor escapes
   if (allTasks.length === 0 && allRedTasks.length > 0 && isOnVent) {
