@@ -219,7 +219,7 @@ if (isWin) {
     setTimeout(() => {
       const modal = document.getElementById("popup-modal");
       document.getElementById("popup-message").textContent =
-        "Congratulations! You won! 🎉<br>Try another level too!";
+        "Congratulations! You won! 🎉Try another level too!";
       modal.style.display = "flex";
       window.popupActive = true;
       document.body.classList.add("popup-active");
