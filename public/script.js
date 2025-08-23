@@ -209,23 +209,38 @@ function endGame(message) {
 
 
 
-  if (isWin) {
+if (isWin) {
     localStorage.setItem("won", "true");
     sounds.win.play();
-   
     replayButton.style.display = "block";
-
     endButton.innerHTML = "📝 Proceed to Form";
+
+    // Show "Try another level too!" message
+    setTimeout(() => {
+      const modal = document.getElementById("popup-modal");
+      document.getElementById("popup-message").textContent =
+        "Congratulations! You won! 🎉<br>Try another level too!";
+      modal.style.display = "flex";
+      window.popupActive = true;
+      document.body.classList.add("popup-active");
+
+      function resumeGame() {
+        modal.style.display = "none";
+        document.removeEventListener("mousedown", resumeGame);
+        document.removeEventListener("touchstart", resumeGame);
+        window.popupActive = false;
+        document.body.classList.remove("popup-active");
+      }
+      document.addEventListener("mousedown", resumeGame);
+      document.addEventListener("touchstart", resumeGame);
+    }, 2200); // Show after the win message on canvas
 
     const winToken = generateToken(); // Create a new token
     localStorage.setItem("secureFormToken", winToken); // Save it to the browser's memory
-
-    // NEW: Update the button's click action to use the token
-    // Make sure 'protected.html' is the name of your protected form file
     endButton.onclick = () => {
       window.location.href = `protected.html?token=${winToken}`;
     };
-  } else {
+} else {
     localStorage.setItem("won", "false");
     
     sounds.lose.play();
@@ -266,7 +281,7 @@ function endGame(message) {
       canvas.width / 2,
       canvas.height / 2 + tileSize * 1.2
     );
-  }, 200);
+  }, 2000);
 }
 // ================================================================================= //
 //                              DRAWING AND DISPLAY                                  //
